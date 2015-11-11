@@ -1,0 +1,49 @@
+class Feature:
+	self.diff
+	# all floats [0-1] relative to box edge
+	self.x1
+	self.y1
+	self.x2
+	self.y2
+	# which haar-like pattern this is
+	self.type
+	# number of times this feature was found on the training set
+	self.timesFound
+
+# x1, y1 is top left, x2, y2 is bottom right
+sumRectRegion((x1, y1), (x2, y2)):
+	return SAT[x2, y2] + SAT[x1, y1] - SAT[x2, y1] - SAT[x1, y2]
+
+for each image in training set:
+	image.convertToGrayscale()
+	# generate summed area table
+	SAT = new Image
+	SAT[0, 0] = input[0, 0]
+	for each pixel(x, y) in input:
+		# could we do a 2d prefix scan here? does such a thing even exist?
+		SAT[x, y] = SAT[x - 1, y] + SAT[x, y - 1] - SAT[x - 1, y - 1] + input[x, y]
+
+	# we would probably want to constrain the aspect ratio, dimensions of search regions
+	for each rectangular region in image:
+		# again, would want to constrain the subregion
+		for each rectangular subregion in region:
+			# need to decide which features to use
+			for each featureType in featureTypes:
+				# this is just 4 memory reads with the SAT approach
+				diff = computeFeatureDiff()
+				if diff > threshold:
+					foundFeatures.add(new Feature(subregion, type, diff))
+
+# now look for each of the features on all the images
+for each image in training set:
+	for each rectangular region in image:
+		for each feature in foundFeatures:
+			# takes the subregion this feature refers to and finds the diff when applied in this region
+			diff = feature.evaluate(region)
+			if diff > threshold:
+				feature.timesFound++
+
+foundFeatures.sortByDiff()
+# we would say we want the top X% of features, then discard the features below that cutoff
+bestFeatures = foundFeatures[0:cutoff]
+return bestFeatures
