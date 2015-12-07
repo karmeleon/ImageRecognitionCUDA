@@ -1,39 +1,42 @@
-﻿  
-  C:\Users\Shawn\Google Drive\Visual Studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64"  -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include"     --keep-dir x64\Release -maxrregcount=0  --machine 64 --compile  -Xcompiler "/openmp"     -DWIN32 -DWIN64 -DNDEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /O2 /Zi  /MD " -o x64\Release\features.cu.obj "C:\Users\Shawn\Google Drive\Visual Studio 2013\Projects\408Final\408Final\features.cu" -clean 
+﻿  Compiling CUDA source file features.cu...
+  
+  C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -gencode=arch=compute_50,code=\"sm_50,compute_50\" --use-local-env --cl-version 2013 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64" -rdc=true -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include"     --keep-dir x64\Release -maxrregcount=0  --machine 64 --compile -cudart static -Xcompiler "/openmp"     -DWIN32 -DWIN64 -DNDEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Ox /Zi  /MT /GR-" -o x64\Release\features.cu.obj "C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final\features.cu" 
   features.cu
-  
-  C:\Users\Shawn\Google Drive\Visual Studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64"  -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include"     --keep-dir x64\Release -maxrregcount=0  --machine 64 --compile  -Xcompiler "/openmp"     -DWIN32 -DWIN64 -DNDEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /O2 /Zi  /MD " -o x64\Release\haarfinder.cu.obj "C:\Users\Shawn\Google Drive\Visual Studio 2013\Projects\408Final\408Final\haarfinder.cu" -clean 
-  haarfinder.cu
-  
-  C:\Users\Shawn\Google Drive\Visual Studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64"  -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include"     --keep-dir x64\Release -maxrregcount=0  --machine 64 --compile  -Xcompiler "/openmp"     -DWIN32 -DWIN64 -DNDEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /O2 /Zi  /MD " -o x64\Release\main.cu.obj "C:\Users\Shawn\Google Drive\Visual Studio 2013\Projects\408Final\408Final\main.cu" -clean 
-  main.cu
-  
-  C:\Users\Shawn\Google Drive\Visual Studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64"  -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include"     --keep-dir x64\Release -maxrregcount=0  --machine 64 --compile  -Xcompiler "/openmp"     -DWIN32 -DWIN64 -DNDEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /O2 /Zi  /MD " -o x64\Release\sat.cu.obj "C:\Users\Shawn\Google Drive\Visual Studio 2013\Projects\408Final\408Final\sat.cu" -clean 
-  sat.cu
-  Compiling CUDA source file features.cu...
-  
-  C:\Users\Shawn\Google Drive\Visual Studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -gencode=arch=compute_50,code=\"sm_50,compute_50\" --use-local-env --cl-version 2013 -Xcompiler /openmp -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64" -rdc=true -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include"     --keep-dir x64\Release -maxrregcount=0  --machine 64 --compile -cudart static -Xcompiler "/openmp"     -DWIN32 -DWIN64 -DNDEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /O2 /Zi  /MD " -o x64\Release\features.cu.obj "C:\Users\Shawn\Google Drive\Visual Studio 2013\Projects\408Final\408Final\features.cu" 
-  features.cu
-C:/Users/Shawn/Google Drive/Visual Studio 2013/Projects/408Final/408Final/features.cu(27): warning C4244: '=' : conversion from 'uint64_t' to 'uint8_t', possible loss of data
-C:/Users/Shawn/Google Drive/Visual Studio 2013/Projects/408Final/408Final/features.cu(28): warning C4244: '=' : conversion from 'uint64_t' to 'uint8_t', possible loss of data
-C:/Users/Shawn/Google Drive/Visual Studio 2013/Projects/408Final/408Final/features.cu(29): warning C4244: '=' : conversion from 'uint64_t' to 'uint8_t', possible loss of data
-C:/Users/Shawn/Google Drive/Visual Studio 2013/Projects/408Final/408Final/features.cu(30): warning C4244: '=' : conversion from 'uint64_t' to 'uint8_t', possible loss of data
-C:/Users/Shawn/Google Drive/Visual Studio 2013/Projects/408Final/408Final/features.cu(31): warning C4244: '=' : conversion from 'uint64_t' to 'uint8_t', possible loss of data
-C:/Users/Shawn/Google Drive/Visual Studio 2013/Projects/408Final/408Final/features.cu(43): warning C4244: 'initializing' : conversion from 'double' to 'int32_t', possible loss of data
+C:/Users/Shawn/google drive/visual studio 2013/Projects/408Final/408Final/features.cu(87): warning C4244: 'initializing' : conversion from 'double' to 'int32_t', possible loss of data
   Compiling CUDA source file haarfinder.cu...
   
-  C:\Users\Shawn\Google Drive\Visual Studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -gencode=arch=compute_50,code=\"sm_50,compute_50\" --use-local-env --cl-version 2013 -Xcompiler /openmp -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64" -rdc=true -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include"     --keep-dir x64\Release -maxrregcount=0  --machine 64 --compile -cudart static -Xcompiler "/openmp"     -DWIN32 -DWIN64 -DNDEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /O2 /Zi  /MD " -o x64\Release\haarfinder.cu.obj "C:\Users\Shawn\Google Drive\Visual Studio 2013\Projects\408Final\408Final\haarfinder.cu" 
-C:/Users/Shawn/Google Drive/Visual Studio 2013/Projects/408Final/408Final/haarfinder.cu(21): warning : expression has no effect
-C:/Users/Shawn/Google Drive/Visual Studio 2013/Projects/408Final/408Final/haarfinder.cu(21): warning : expression has no effect
+  C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -gencode=arch=compute_50,code=\"sm_50,compute_50\" --use-local-env --cl-version 2013 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64" -rdc=true -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include"     --keep-dir x64\Release -maxrregcount=0  --machine 64 --compile -cudart static -Xcompiler "/openmp"     -DWIN32 -DWIN64 -DNDEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Ox /Zi  /MT /GR-" -o x64\Release\haarfinder.cu.obj "C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final\haarfinder.cu" 
   haarfinder.cu
   Compiling CUDA source file main.cu...
   
-  C:\Users\Shawn\Google Drive\Visual Studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -gencode=arch=compute_50,code=\"sm_50,compute_50\" --use-local-env --cl-version 2013 -Xcompiler /openmp -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64" -rdc=true -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include"     --keep-dir x64\Release -maxrregcount=0  --machine 64 --compile -cudart static -Xcompiler "/openmp"     -DWIN32 -DWIN64 -DNDEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /O2 /Zi  /MD " -o x64\Release\main.cu.obj "C:\Users\Shawn\Google Drive\Visual Studio 2013\Projects\408Final\408Final\main.cu" 
+  C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -gencode=arch=compute_50,code=\"sm_50,compute_50\" --use-local-env --cl-version 2013 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64" -rdc=true -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include"     --keep-dir x64\Release -maxrregcount=0  --machine 64 --compile -cudart static -Xcompiler "/openmp"     -DWIN32 -DWIN64 -DNDEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Ox /Zi  /MT /GR-" -o x64\Release\main.cu.obj "C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final\main.cu" 
   main.cu
   Compiling CUDA source file sat.cu...
   
-  C:\Users\Shawn\Google Drive\Visual Studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -gencode=arch=compute_50,code=\"sm_50,compute_50\" --use-local-env --cl-version 2013 -Xcompiler /openmp -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64" -rdc=true -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include"     --keep-dir x64\Release -maxrregcount=0  --machine 64 --compile -cudart static -Xcompiler "/openmp"     -DWIN32 -DWIN64 -DNDEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /O2 /Zi  /MD " -o x64\Release\sat.cu.obj "C:\Users\Shawn\Google Drive\Visual Studio 2013\Projects\408Final\408Final\sat.cu" 
+  C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -gencode=arch=compute_50,code=\"sm_50,compute_50\" --use-local-env --cl-version 2013 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64" -rdc=true -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include"     --keep-dir x64\Release -maxrregcount=0  --machine 64 --compile -cudart static -Xcompiler "/openmp"     -DWIN32 -DWIN64 -DNDEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Ox /Zi  /MT /GR-" -o x64\Release\sat.cu.obj "C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final\sat.cu" 
   sat.cu
   
-  C:\Users\Shawn\Google Drive\Visual Studio 2013\Projects\408Final\408Final>-Xcompiler /openmp "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -dlink -o x64\Release\408Final.device-link.obj -Xcompiler "/EHsc /W3 /nologo /O2 /Zi  /MD " -L"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\lib\x64" cudart.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib  -gencode=arch=compute_50,code=sm_50  --machine 64 x64\Release\features.cu.obj x64\Release\haarfinder.cu.obj x64\Release\main.cu.obj x64\Release\sat.cu.obj 
-C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\BuildCustomizations\CUDA 7.5.targets(690,9): error MSB3721: The command "-Xcompiler /openmp "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -dlink -o x64\Release\408Final.device-link.obj -Xcompiler "/EHsc /W3 /nologo /O2 /Zi  /MD " -L"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\lib\x64" cudart.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib  -gencode=arch=compute_50,code=sm_50  --machine 64 x64\Release\features.cu.obj x64\Release\haarfinder.cu.obj x64\Release\main.cu.obj x64\Release\sat.cu.obj" exited with code 1.
+  C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -dlink -o x64\Release\408Final.device-link.obj -Xcompiler "/EHsc /W3 /nologo /Ox /Zi  /MT /GR-" -L"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\lib\x64" cudart.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib  -gencode=arch=compute_50,code=sm_50  --machine 64 x64\Release\features.cu.obj x64\Release\haarfinder.cu.obj x64\Release\main.cu.obj x64\Release\sat.cu.obj 
+  cudart.lib
+  kernel32.lib
+  user32.lib
+  gdi32.lib
+  winspool.lib
+  comdlg32.lib
+  advapi32.lib
+  shell32.lib
+  ole32.lib
+  oleaut32.lib
+  uuid.lib
+  odbc32.lib
+  odbccp32.lib
+  features.cu.obj
+  haarfinder.cu.obj
+  main.cu.obj
+  sat.cu.obj
+  LINK : /LTCG specified but no code generation required; remove /LTCG from the link command line to improve linker performance
+  408Final.vcxproj -> C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\x64\Release\408Final.exe
+  copy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\cudart*.dll" "C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\x64\Release\"
+  C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\cudart32_75.dll
+  C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\cudart64_75.dll
+          2 file(s) copied.

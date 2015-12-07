@@ -450,5 +450,12 @@ C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\thr/xthread
 C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\thr/xtime
 C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\thr/xthreads.h
 C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\omp.h
-C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include\cuda_runtime.h
+C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sys/timeb.h
+C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\crtdefs.h
+C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\crtdefs.h
+C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sys/timeb.inl
 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include\device_launch_parameters.h
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include\cuda_runtime.h
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include\cuda.h
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include\cuda_runtime_api.h
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include\device_functions.h
