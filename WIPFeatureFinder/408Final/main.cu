@@ -14,7 +14,7 @@ void addVertLine(uint32_t* buf) {
 	for (int i = 0; i < IMAGE_SIZE; i++) {
 		for (int j = 0; j < IMAGE_SIZE; j++) {
 			if (j > IMAGE_SIZE / 3 && j < 2 * IMAGE_SIZE / 3)
-				buf[j + IMAGE_SIZE * i] = 255;
+				buf[j + IMAGE_SIZE * i] = 1;
 			else
 				buf[j + IMAGE_SIZE * i] = 0;
 		}
@@ -29,9 +29,15 @@ uint32_t* generateImages(int num) {
 		addPureWhite(&images[(i + 1) * IMAGE_SIZE * IMAGE_SIZE]);
 	}*/
 
-	for (int i = 0; i < num; i++) {
+	for (int i = 0; i < num; i += 3) {
 		addPureBlack(&images[i * IMAGE_SIZE * IMAGE_SIZE]);
+		addPureWhite(&images[(i + 1) * IMAGE_SIZE * IMAGE_SIZE]);
+		addVertLine(&images[(i + 2) * IMAGE_SIZE * IMAGE_SIZE]);
 	}
+
+	/*for (int i = 0; i < num; i++) {
+		addPureBlack(&images[i * IMAGE_SIZE * IMAGE_SIZE]);
+	}*/
 
 	/*for (int i = 0; i < num; i++) {
 		addVertLine(&images[i * IMAGE_SIZE * IMAGE_SIZE]);
@@ -40,7 +46,7 @@ uint32_t* generateImages(int num) {
 }
 
 int main() {
-	int count = 1;
+	int count = 348;
 	uint32_t* images = generateImages(count);
 	uint32_t numFeatures;
 	struct timeb start, end;
@@ -56,7 +62,7 @@ int main() {
 		printf("\n");
 	}
 
-	printf("Found %u features\n", numFeatures);
+	printf("Found %u features, displaying first %d\n", numFeatures, min(10, numFeatures));
 
 	free(features);
 	free(images);

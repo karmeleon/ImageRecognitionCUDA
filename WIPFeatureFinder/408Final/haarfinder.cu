@@ -19,6 +19,8 @@ __device__ feature packFeature(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, u
 	f.y1 = y1;
 	f.x2 = x2;
 	f.y2 = y2;
+	f.mag = mag;
+	f.type = type;
 	return f;
 }
 
@@ -59,15 +61,19 @@ __device__ void saveFeature(uint32_t* featureIndex, feature* features, feature f
 
 __device__ feature evalHorizEdge(uint32_t* sat, uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, int32_t threshold) {
 	uint8_t y3 = (y1 + y2) / 2;
-	// blockIdx.x == 0 && x1 == 5 && y1 == 0 && x2 == 9 && y2 == 4
-	uint32_t topWeight = y3 - (y1 - 1);
-	uint32_t bottomWeight = y2 - (y3 - 1);
+	
+	uint32_t whiteWeight = y3 - (y1 - 1);
+	uint32_t blackWeight = y2 - y3;
 
-	uint32_t top = regionMag(sat, x1, y1, x2, y3) * bottomWeight / (topWeight + bottomWeight);
-	uint32_t bottom = regionMag(sat, x1, y3, x2, y2) * topWeight / (topWeight + bottomWeight);
-	int32_t mag = bottom - top;
-	if (abs(mag) > threshold * (x2 - x1) * (y2 - y1))
-		return packFeature(x1, y1, x2, y2, HEDGE, mag);
+	uint32_t white = regionMag(sat, x1, y1, x2, y3);
+	uint32_t black = regionMag(sat, x1, y3 + 1, x2, y2);
+
+	float diffWhite = (float)white / whiteWeight;
+	float diffBlack = (float)black / blackWeight;
+
+	float diffMag = diffWhite - diffBlack;
+	if (abs(diffMag) > threshold * (x2 - x1))
+		return packFeature(x1, y1, x2, y2, HEDGE, (int32_t)white - (int32_t)black);
 	else
 		return noFeature();
 }
@@ -75,14 +81,18 @@ __device__ feature evalHorizEdge(uint32_t* sat, uint8_t x1, uint8_t y1, uint8_t 
 __device__ feature evalVertEdge(uint32_t* sat, uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, int32_t threshold) {
 	uint8_t x3 = (x1 + x2) / 2;
 
-	uint32_t leftWeight = x3 - (x1 - 1);
-	uint32_t rightWeight = x2 - (x3 - 1);
+	uint32_t whiteWeight = x3 - (x1 - 1);
+	uint32_t blackWeight = x2 - x3;
 
-	uint32_t left = regionMag(sat, x1, y1, x3, y2) * rightWeight / (leftWeight + rightWeight);
-	uint32_t right = regionMag(sat, x3, y1, x2, y2) * leftWeight / (leftWeight + rightWeight);
-	int32_t mag = right - left;
-	if (abs(mag) > threshold * (x2 - x1) * (y2 - y1))
-		return packFeature(x1, y1, x2, y2, VEDGE, mag);
+	uint32_t white = regionMag(sat, x1, y1, x3, y2);
+	uint32_t black = regionMag(sat, x3 + 1, y1, x2, y2);
+
+	float diffWhite = (float)white / whiteWeight;
+	float diffBlack = (float)black / blackWeight;
+
+	float diffMag = diffWhite - diffBlack;
+	if (abs(diffMag) > threshold * (y2 - y1))
+		return packFeature(x1, y1, x2, y2, VEDGE, (int32_t)white - (int32_t)black);
 	else
 		return noFeature();
 }
@@ -91,16 +101,26 @@ __device__ feature evalHorizLine(uint32_t* sat, uint8_t x1, uint8_t y1, uint8_t 
 	uint8_t y3 = (3 * y1 + y2) / 4;
 	uint8_t y4 = (y1 + 3 * y2) / 4;
 
-	uint32_t topWeight = y3 - (y1 - 1);
-	uint32_t centerWeight = y4 - (y3 - 1);
-	uint32_t bottomWeight = y2 - (y4 - 1);
-	
-	uint32_t top = regionMag(sat, x1, y1, x2, y3) * (centerWeight + bottomWeight) / (topWeight + centerWeight + bottomWeight);
-	uint32_t center = regionMag(sat, x1, y3, x2, y4) * (topWeight + bottomWeight) / (topWeight + centerWeight + bottomWeight);
-	uint32_t bottom = regionMag(sat, x1, y4, x2, y2) * (centerWeight + topWeight) / (topWeight + centerWeight + bottomWeight);
-	int32_t mag = center - (top + bottom);
-	if (abs(mag) > threshold * (x2 - x1) * (y2 - y1))
-		return packFeature(x1, y1, x2, y2, HLINE, mag);
+	uint32_t whiteWeight = y3 - y1 + y2 - (y4 - 1);
+	uint32_t blackWeight = y4 - y3;
+
+	uint32_t white = 0;
+	uint32_t black = 0;
+
+	// top
+	white += regionMag(sat, x1, y1, x2, y3);
+	// bottom
+	white += regionMag(sat, x1, y4 + 1, x2, y2);
+
+	// middle
+	black += regionMag(sat, x1, y3 + 1, x2, y4);
+
+	float diffWhite = (float)white / whiteWeight;
+	float diffBlack = (float)black / blackWeight;
+
+	float diffMag = diffWhite - diffBlack;
+	if (abs(diffMag) > threshold * (x2 - x1))
+		return packFeature(x1, y1, x2, y2, HLINE, (int32_t)white - (int32_t)black);
 	else
 		return noFeature();
 }
@@ -109,16 +129,26 @@ __device__ feature evalVertLine(uint32_t* sat, uint8_t x1, uint8_t y1, uint8_t x
 	uint8_t x3 = (3 * x1 + x2) / 4;
 	uint8_t x4 = (x1 + 3 * x2) / 4;
 	
-	uint32_t leftWeight = x3 - (x1 - 1);
-	uint32_t centerWeight = x4 - (x3 - 1);
-	uint32_t rightWeight = x2 - (x4 - 1);
+	uint32_t whiteWeight = x3 - x1 + x2 - (x4 - 1);
+	uint32_t blackWeight = x4 - x3;
 
-	uint32_t left = regionMag(sat, x1, y1, x3, y2) * (centerWeight + rightWeight) / (leftWeight + centerWeight + rightWeight);
-	uint32_t center = regionMag(sat, x3, y1, x4, y2) * (leftWeight + rightWeight) / (leftWeight + centerWeight + rightWeight);
-	uint32_t right = regionMag(sat, x4, y1, x2, y2) * (rightWeight + rightWeight) / (leftWeight + centerWeight + rightWeight);
-	int32_t mag = center - (left + right);
-	if (abs(mag) > threshold * (x2 - x1) * (y2 - y1))
-		return packFeature(x1, y1, x2, y2, VLINE, mag);
+	uint32_t white = 0;
+	uint32_t black = 0;
+
+	// left
+	white += regionMag(sat, x1, y1, x3, y2);
+	// right
+	white += regionMag(sat, x4 + 1, y1, x2, y2);
+
+	// center
+	black += regionMag(sat, x3 + 1, y1, x4, y2);
+	
+	float diffWhite = (float)white / whiteWeight;
+	float diffBlack = (float)black / blackWeight;
+
+	float diffMag = diffWhite - diffBlack;
+	if (abs(diffMag) > threshold * (y2 - y1))
+		return packFeature(x1, y1, x2, y2, VLINE, (int32_t)white - (int32_t)black);
 	else
 		return noFeature();
 }
@@ -127,13 +157,32 @@ __device__ feature evalFourRectangle(uint32_t* sat, uint8_t x1, uint8_t y1, uint
 	uint8_t x3 = (x1 + x2) / 2;
 	uint8_t y3 = (y1 + y2) / 2;
 
-	uint32_t topLeft = regionMag(sat, x1, y1, x3, y3);
-	uint32_t topRight = regionMag(sat, x3, y1, x2, y3);
-	uint32_t bottomLeft = regionMag(sat, x1, y3, x3, y2);
-	uint32_t bottomRight = regionMag(sat, x3, y3, x2, y2);
-	int32_t mag = (bottomLeft + topRight) - (topLeft + bottomRight);
-	if (abs(mag) > threshold * (x2 - x1) * (y2 - y1))
-		return packFeature(x1, y1, x2, y2, RECT4, mag);
+	uint32_t topWeight = y3 - (y1 - 1);
+	uint32_t bottomWeight = y2 - y3;
+	uint32_t leftWeight = x3 - (x1 - 1);
+	uint32_t rightWeight = x2 - x3;
+
+	uint32_t whiteWeight = topWeight * leftWeight + bottomWeight * rightWeight;
+	uint32_t blackWeight = topWeight * rightWeight + bottomWeight * leftWeight;
+
+	uint32_t white = 0;
+	uint32_t black = 0;
+
+	// top left
+	white += regionMag(sat, x1, y1, x3, y3);
+	// top right
+	black += regionMag(sat, x3 + 1, y1, x2, y3);
+	// bottom left
+	black += regionMag(sat, x1, y3 + 1, x3, y2);
+	// bottom right
+	white += regionMag(sat, x3 + 1, y3 + 1, x2, y2);
+
+	float diffWhite = (float)white / whiteWeight;
+	float diffBlack = (float)black / blackWeight;
+
+	float diffMag = diffWhite - diffBlack;
+	if (abs(diffMag) > threshold)
+		return packFeature(x1, y1, x2, y2, RECT4, (int32_t)white - (int32_t)black);
 	else
 		return noFeature();
 }

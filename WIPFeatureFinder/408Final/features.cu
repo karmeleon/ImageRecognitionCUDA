@@ -1,12 +1,13 @@
 #include "features.cuh"
 
-// 6 MiB should be enough
-#define FEATURE_BUFFER_SIZE 1024 * 1024 * 6
-#define FEATURES_IN_BUFFER FEATURE_BUFFER_SIZE / sizeof(feature)
+// a 28*28 image has 164836 total rectangular regions in it, times 5 possible features
+// going a little less than that because our smallest region size is 4x4 and we're not going to fill it anyway
+#define FEATURES_IN_BUFFER 100000 * 5
+#define FEATURE_BUFFER_SIZE FEATURES_IN_BUFFER * sizeof(feature)
 // fraction of free VRAM to use
 #define FREE_VRAM_USAGE .6
 // the average pixel difference to trigger a feature
-#define THRESHOLD 10
+#define THRESHOLD 0
 #define THREADS_PER_BLOCK 32
 
 __global__ void findFeatures(uint32_t* imageBuffer, feature* featureBuffer) {
@@ -85,7 +86,7 @@ feature* findFeatures(uint32_t* hostImageBuffer, uint32_t count, uint32_t* numFe
 
 	// compute number of images we can process at once
 	int32_t concImages = freeMem * FREE_VRAM_USAGE / (FEATURE_BUFFER_SIZE + IMAGE_SIZE * IMAGE_SIZE * sizeof(uint32_t));
-	printf("Computing %d images at once using %lu MB of memory\n", concImages, concImages * (FEATURE_BUFFER_SIZE + IMAGE_SIZE * IMAGE_SIZE * sizeof(uint32_t))/1024/1024);
+	printf("Computing up to %d images at once using %lu MB of memory and %d kernels\n", concImages, concImages * (FEATURE_BUFFER_SIZE + IMAGE_SIZE * IMAGE_SIZE * sizeof(uint32_t))/1024/1024, (int)ceil((float)count / concImages));
 
 	feature* hostFeatureBuffer = (feature*)malloc(FEATURE_BUFFER_SIZE * concImages);
 	feature* deviceFeatureBuffer;
@@ -157,14 +158,12 @@ feature* findFeatures(uint32_t* hostImageBuffer, uint32_t count, uint32_t* numFe
 					// there are no more features in this buffer, dump it into the combined buffer
 					#pragma omp critical
 					{
-						//printf("found %d features in image %d\n", j, i);
 						int32_t spaceInBuffer = finishedFeatureBufferSize - numFinishedFeatures;
 						// make the combined buffer bigger if necessary
 						if (spaceInBuffer < j) {
 							finishedFeatures = (feature*)realloc(finishedFeatures, (finishedFeatureBufferSize + concImages * FEATURES_IN_BUFFER) * sizeof(feature));
 							finishedFeatureBufferSize += concImages * FEATURES_IN_BUFFER;
 						}
-						//memcpy(&(finishedFeatures[numFinishedFeatures]), threadFeatureBuffers[id], j * sizeof(feature));
 						memcpy(&(finishedFeatures[numFinishedFeatures]), &(hostFeatureBuffer[FEATURES_IN_BUFFER * i]), j * sizeof(feature));
 						numFinishedFeatures += j;
 					}
@@ -174,8 +173,6 @@ feature* findFeatures(uint32_t* hostImageBuffer, uint32_t count, uint32_t* numFe
 					break;
 			}
 		}
-		//OMPUnpackedImages += concImages;
-		//printf("%d%% complete (%u / %u), found %u features so far (%u MB feat buffer)\n", OMPUnpackedImages * 100 / count, OMPUnpackedImages, count, numFinishedFeatures, finishedFeatureBufferSize / 1024 / 1024 * sizeof(feature));
 
 		// clear the host feature buffer
 		memset(hostFeatureBuffer, 0, FEATURE_BUFFER_SIZE * concImages);
