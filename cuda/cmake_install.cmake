@@ -1,4 +1,4 @@
-# Install script for directory: /Users/nathanhavens/Desktop/ECE 408/final_project/tests/weak
+# Install script for directory: /Users/nathanhavens/Desktop/ECE 408/final_project/tests/cuda
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -35,5 +35,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/weak/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/cuda/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

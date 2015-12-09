@@ -35,10 +35,10 @@ RM = /usr/local/Cellar/cmake/3.2.2/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/weak"
+CMAKE_SOURCE_DIR = "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/cuda"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/weak"
+CMAKE_BINARY_DIR = "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/cuda"
 
 # Include any dependencies generated for this target.
 include CMakeFiles/weak_classifier.dir/depend.make
@@ -300,17 +300,17 @@ CMakeFiles/weak_classifier.dir/weak_classifier_generated_weak_classifier.cu.o: /
 CMakeFiles/weak_classifier.dir/weak_classifier_generated_weak_classifier.cu.o: /usr/local/cuda/include/vector_types.h
 CMakeFiles/weak_classifier.dir/weak_classifier_generated_weak_classifier.cu.o: CMakeFiles/weak_classifier.dir/weak_classifier_generated_weak_classifier.cu.o.cmake
 CMakeFiles/weak_classifier.dir/weak_classifier_generated_weak_classifier.cu.o: weak_classifier.cu
-	$(CMAKE_COMMAND) -E cmake_progress_report "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/weak/CMakeFiles" $(CMAKE_PROGRESS_1)
+	$(CMAKE_COMMAND) -E cmake_progress_report "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/cuda/CMakeFiles" $(CMAKE_PROGRESS_1)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Building NVCC (Device) object CMakeFiles/weak_classifier.dir/weak_classifier_generated_weak_classifier.cu.o"
-	cd "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/weak/CMakeFiles/weak_classifier.dir" && /usr/local/Cellar/cmake/3.2.2/bin/cmake -E make_directory /Users/nathanhavens/Desktop/ECE\ 408/final_project/tests/weak/CMakeFiles/weak_classifier.dir//.
-	cd "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/weak/CMakeFiles/weak_classifier.dir" && /usr/local/Cellar/cmake/3.2.2/bin/cmake -D verbose:BOOL=$(VERBOSE) -D build_configuration:STRING= -D generated_file:STRING=/Users/nathanhavens/Desktop/ECE\ 408/final_project/tests/weak/CMakeFiles/weak_classifier.dir//./weak_classifier_generated_weak_classifier.cu.o -D generated_cubin_file:STRING=/Users/nathanhavens/Desktop/ECE\ 408/final_project/tests/weak/CMakeFiles/weak_classifier.dir//./weak_classifier_generated_weak_classifier.cu.o.cubin.txt -P /Users/nathanhavens/Desktop/ECE\ 408/final_project/tests/weak/CMakeFiles/weak_classifier.dir//weak_classifier_generated_weak_classifier.cu.o.cmake
+	cd "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/cuda/CMakeFiles/weak_classifier.dir" && /usr/local/Cellar/cmake/3.2.2/bin/cmake -E make_directory /Users/nathanhavens/Desktop/ECE\ 408/final_project/tests/cuda/CMakeFiles/weak_classifier.dir//.
+	cd "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/cuda/CMakeFiles/weak_classifier.dir" && /usr/local/Cellar/cmake/3.2.2/bin/cmake -D verbose:BOOL=$(VERBOSE) -D build_configuration:STRING= -D generated_file:STRING=/Users/nathanhavens/Desktop/ECE\ 408/final_project/tests/cuda/CMakeFiles/weak_classifier.dir//./weak_classifier_generated_weak_classifier.cu.o -D generated_cubin_file:STRING=/Users/nathanhavens/Desktop/ECE\ 408/final_project/tests/cuda/CMakeFiles/weak_classifier.dir//./weak_classifier_generated_weak_classifier.cu.o.cubin.txt -P /Users/nathanhavens/Desktop/ECE\ 408/final_project/tests/cuda/CMakeFiles/weak_classifier.dir//weak_classifier_generated_weak_classifier.cu.o.cmake
 
 # Object files for target weak_classifier
 weak_classifier_OBJECTS =
 
 # External object files for target weak_classifier
 weak_classifier_EXTERNAL_OBJECTS = \
-"/Users/nathanhavens/Desktop/ECE 408/final_project/tests/weak/CMakeFiles/weak_classifier.dir/weak_classifier_generated_weak_classifier.cu.o"
+"/Users/nathanhavens/Desktop/ECE 408/final_project/tests/cuda/CMakeFiles/weak_classifier.dir/weak_classifier_generated_weak_classifier.cu.o"
 
 weak_classifier: CMakeFiles/weak_classifier.dir/weak_classifier_generated_weak_classifier.cu.o
 weak_classifier: CMakeFiles/weak_classifier.dir/build.make
@@ -331,6 +331,6 @@ CMakeFiles/weak_classifier.dir/clean:
 .PHONY : CMakeFiles/weak_classifier.dir/clean
 
 CMakeFiles/weak_classifier.dir/depend: CMakeFiles/weak_classifier.dir/weak_classifier_generated_weak_classifier.cu.o
-	cd "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/weak" && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/weak" "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/weak" "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/weak" "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/weak" "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/weak/CMakeFiles/weak_classifier.dir/DependInfo.cmake" --color=$(COLOR)
+	cd "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/cuda" && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/cuda" "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/cuda" "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/cuda" "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/cuda" "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/cuda/CMakeFiles/weak_classifier.dir/DependInfo.cmake" --color=$(COLOR)
 .PHONY : CMakeFiles/weak_classifier.dir/depend
 

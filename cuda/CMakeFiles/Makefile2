@@ -47,10 +47,10 @@ RM = /usr/local/Cellar/cmake/3.2.2/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/weak"
+CMAKE_SOURCE_DIR = "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/cuda"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/weak"
+CMAKE_BINARY_DIR = "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/cuda"
 
 #=============================================================================
 # Target rules for target CMakeFiles/weak_classifier.dir
@@ -59,7 +59,7 @@ CMAKE_BINARY_DIR = "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/weak
 CMakeFiles/weak_classifier.dir/all:
 	$(MAKE) -f CMakeFiles/weak_classifier.dir/build.make CMakeFiles/weak_classifier.dir/depend
 	$(MAKE) -f CMakeFiles/weak_classifier.dir/build.make CMakeFiles/weak_classifier.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/weak/CMakeFiles"  1
+	$(CMAKE_COMMAND) -E cmake_progress_report "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/cuda/CMakeFiles"  1
 	@echo "Built target weak_classifier"
 .PHONY : CMakeFiles/weak_classifier.dir/all
 
@@ -69,9 +69,9 @@ all: CMakeFiles/weak_classifier.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/weak_classifier.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/weak/CMakeFiles" 1
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/cuda/CMakeFiles" 1
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/weak_classifier.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/weak/CMakeFiles" 0
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/nathanhavens/Desktop/ECE 408/final_project/tests/cuda/CMakeFiles" 0
 .PHONY : CMakeFiles/weak_classifier.dir/rule
 
 # Convenience name for target.
