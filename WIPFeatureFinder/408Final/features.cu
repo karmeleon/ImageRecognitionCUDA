@@ -1,30 +1,34 @@
 #include "features.cuh"
 
-// a 28*28 image has 164836 total rectangular regions in it, times 5 possible features
-// going a little less than that because our smallest region size is 4x4 and we're not going to fill it anyway
-#define FEATURES_IN_BUFFER 100000 * 5
-#define FEATURE_BUFFER_SIZE FEATURES_IN_BUFFER * sizeof(feature)
+// a 28*28 image has 90 000 rectangular regions with dimensions >= 4x4, times 5 possible features per region
+// doing much less than that because the chances every region has all 5 features is virtually 0
+#define FEATURES_PER_IMAGE (70000 * 5)
+#define FEATURE_BUFFER_SIZE_PER_IMAGE (FEATURES_PER_IMAGE * sizeof(feature))
+#define TOTAL_FEATURE_BUFFER_SIZE (FEATURE_BUFFER_SIZE_PER_IMAGE * concImages)
+#define TOTAL_FEATURE_BUFFER_COUNT (FEATURES_PER_IMAGE * concImages)
 // fraction of free VRAM to use
 #define FREE_VRAM_USAGE .6
 // the average pixel difference to trigger a feature
-#define THRESHOLD 0
-#define THREADS_PER_BLOCK 32
+#define THRESHOLD 10
+#define THREADS_PER_BLOCK 128
 
-__global__ void findFeatures(uint32_t* imageBuffer, feature* featureBuffer) {
+__global__ void findFeatures(uint32_t* imageBuffer, feature* featureBuffer, uint32_t* featureIndex) {
 	uint32_t imgId = blockIdx.x;
 	uint32_t* img = &(imageBuffer[IMAGE_SIZE * IMAGE_SIZE * imgId]);
-	feature* features = &(featureBuffer[FEATURES_IN_BUFFER * imgId]);
 
 	// build the SAT
 	if (threadIdx.x < 32)
 		scan2d(img);
+	__syncthreads();
 
 	// copy the SAT to shared memory
 	__shared__ uint32_t SAT[IMAGE_SIZE * IMAGE_SIZE];
 	memcpy(SAT, img, IMAGE_SIZE * IMAGE_SIZE * sizeof(uint32_t));
 
+	__syncthreads();
+
 	// find haar-like features
-	haarfinder(SAT, features, THRESHOLD);
+	haarfinder(SAT, featureBuffer, THRESHOLD, featureIndex);
 }
 
 void printFeature(feature feat) {
@@ -53,31 +57,6 @@ void printFeature(feature feat) {
 	printf("(%d, %d) -> (%d, %d)\n", feat.x1, feat.y1, feat.x2, feat.y2);
 }
 
-//uint64_t packFeature(feature unpacked) {
-//	// 7 bits each for x1, y1, x2, y2
-//	uint64_t out = 0;
-//	// bitwise operations are so satisfying
-//	out |= ((uint64_t)unpacked.x1) << 57;
-//	out |= ((uint64_t)unpacked.y1) << 50;
-//	out |= ((uint64_t)unpacked.x2) << 43;
-//	out |= ((uint64_t)unpacked.y2) << 36;
-//	out |= ((uint64_t)unpacked.type) << 33;
-//	((int32_t*)&out)[0] = ((int32_t)unpacked.mag);
-//	return out;
-//}
-
-// unpacks a bitpacked CUDA feature into a C feature struct
-//inline feature unpackFeature(uint64_t packed) {
-//	feature out;
-//	out.x1 = (packed & 0xfe00000000000000) >> 57;
-//	out.y1 = (packed & 0x1fc000000000000) >> 50;
-//	out.x2 = (packed & 0x003f80000000000) >> 43;
-//	out.y2 = (packed & 0x00007f000000000) >> 36;
-//	out.type = (packed & 0xe00000000) >> 33;
-//	out.mag = (packed & 0xffffffff);
-//	return out;
-//}
-
 feature* findFeatures(uint32_t* hostImageBuffer, uint32_t count, uint32_t* numFeatures) {
 	// get the amount of vram we can allocate for this step
 	size_t freeMem, totalMem;
@@ -85,24 +64,28 @@ feature* findFeatures(uint32_t* hostImageBuffer, uint32_t count, uint32_t* numFe
 	printf("CUDA memory: Total: %d MB, free: %d MB\n", totalMem/1024/1024, freeMem/1024/1024);
 
 	// compute number of images we can process at once
-	int32_t concImages = freeMem * FREE_VRAM_USAGE / (FEATURE_BUFFER_SIZE + IMAGE_SIZE * IMAGE_SIZE * sizeof(uint32_t));
-	printf("Computing up to %d images at once using %lu MB of memory and %d kernels\n", concImages, concImages * (FEATURE_BUFFER_SIZE + IMAGE_SIZE * IMAGE_SIZE * sizeof(uint32_t))/1024/1024, (int)ceil((float)count / concImages));
+	int32_t concImages = freeMem * FREE_VRAM_USAGE / (FEATURE_BUFFER_SIZE_PER_IMAGE + IMAGE_SIZE * IMAGE_SIZE * sizeof(uint32_t));
+	printf("Computing up to %d images at once using %lu MB of memory and %d kernels\n", concImages, concImages * (FEATURE_BUFFER_SIZE_PER_IMAGE + IMAGE_SIZE * IMAGE_SIZE * sizeof(uint32_t)) / 1024 / 1024, (int)ceil((float)count / concImages));
 
-	feature* hostFeatureBuffer = (feature*)malloc(FEATURE_BUFFER_SIZE * concImages);
+	printf("Readying kernel 0\n");
+
+	//feature* hostFeatureBuffer = (feature*)malloc(FEATURE_BUFFER_SIZE * concImages);
+	uint32_t hostFeatureIndex;
 	feature* deviceFeatureBuffer;
-	uint32_t* deviceImageBuffer;
+	uint32_t* deviceImageBuffer, *deviceFeatureIndex;
 
-	wbCheck(cudaMalloc((void**)&deviceFeatureBuffer, FEATURE_BUFFER_SIZE * concImages));
+	wbCheck(cudaMalloc((void**)&deviceFeatureBuffer, TOTAL_FEATURE_BUFFER_SIZE));
 	wbCheck(cudaMalloc((void**)&deviceImageBuffer, IMAGE_SIZE * IMAGE_SIZE * concImages * sizeof(uint32_t)));
+	wbCheck(cudaMalloc((void**)&deviceFeatureIndex, sizeof(uint32_t)));
 
 	uint32_t handledImages = 0;
 
-	bool kernelRunning = true;
+	bool kernelRunning = concImages < count;
 	bool willTerminate = false;
 
 	// this will be expanded if necessary
-	uint32_t finishedFeatureBufferSize = concImages * FEATURES_IN_BUFFER / 2;
-	uint32_t numFinishedFeatures = 0;
+	int32_t finishedFeatureBufferSize = concImages * FEATURES_PER_IMAGE;
+	int32_t numFinishedFeatures = 0;
 	feature* finishedFeatures = (feature*)malloc(finishedFeatureBufferSize * sizeof(feature));
 
 	// the CUDA part
@@ -111,71 +94,64 @@ feature* findFeatures(uint32_t* hostImageBuffer, uint32_t count, uint32_t* numFe
 	cudaDeviceSetCacheConfig(cudaFuncCachePreferShared);
 
 	// clear feature buffer and copy first batch of images to device
-	wbCheck(cudaMemset(deviceFeatureBuffer, 0, FEATURE_BUFFER_SIZE * concImages));
+	wbCheck(cudaMemset(deviceFeatureBuffer, 0, TOTAL_FEATURE_BUFFER_SIZE));
 	wbCheck(cudaMemset(deviceImageBuffer, 0, IMAGE_SIZE * IMAGE_SIZE * concImages * sizeof(uint32_t)));
+	wbCheck(cudaMemset(deviceFeatureIndex, 0, sizeof(uint32_t)));
 	wbCheck(cudaMemcpy(deviceImageBuffer, &(hostImageBuffer[handledImages * IMAGE_SIZE * IMAGE_SIZE]), IMAGE_SIZE * IMAGE_SIZE * min(concImages, count - handledImages) * sizeof(uint32_t), cudaMemcpyHostToDevice));
 
 	dim3 dimGrid(min(concImages, count - handledImages), 1, 1);
-	// one warp per block, we can crank this later if it helps
 	dim3 dimBlock(THREADS_PER_BLOCK, 1, 1);
 
-	findFeatures <<<dimGrid, dimBlock>>>(deviceImageBuffer, deviceFeatureBuffer);
+	printf("Launching kernel 0\n");
+
+	findFeatures <<<dimGrid, dimBlock>>>(deviceImageBuffer, deviceFeatureBuffer, deviceFeatureIndex);
 
 	handledImages += min(concImages, count - handledImages);
 
-	//uint32_t OMPUnpackedImages = 0;
+	uint32_t kernels = 0;
 
 	do {
+		kernels++;
 		// copy feature buffer from device
 		// cudaMemcpy blocks until the previous kernel finishes
-		wbCheck(cudaMemcpy(hostFeatureBuffer, deviceFeatureBuffer, FEATURE_BUFFER_SIZE * concImages, cudaMemcpyDeviceToHost));
+		// see how much we have to copy
+		wbCheck(cudaMemcpy(&hostFeatureIndex, deviceFeatureIndex, sizeof(uint32_t), cudaMemcpyDeviceToHost));
+		printf("Kernel %u output sized %u elements (%u MB, %u%% full)\n", kernels, hostFeatureIndex, hostFeatureIndex * sizeof(feature) / 1024 / 1024, (uint32_t)((float)hostFeatureIndex * 100 / TOTAL_FEATURE_BUFFER_COUNT));
+
+		if (hostFeatureIndex > TOTAL_FEATURE_BUFFER_COUNT)
+			printf("Buffer overflow by %u features, increase FEATURES_PER_IMAGE or THRESHOLD\n", hostFeatureIndex - TOTAL_FEATURE_BUFFER_COUNT);
+
+		// then copy it, but make sure it'll fit first
+		if (numFinishedFeatures + hostFeatureIndex > finishedFeatureBufferSize) {
+			printf("Resizing host buffer to %u elements (%u MB)\n", finishedFeatureBufferSize + TOTAL_FEATURE_BUFFER_COUNT, (finishedFeatureBufferSize * sizeof(feature) + TOTAL_FEATURE_BUFFER_SIZE) / 1024 / 1024);
+			finishedFeatures = (feature*)realloc(finishedFeatures, finishedFeatureBufferSize * sizeof(feature) + TOTAL_FEATURE_BUFFER_SIZE);
+			finishedFeatureBufferSize += TOTAL_FEATURE_BUFFER_COUNT;
+		}
+		printf("Copying buffer to host\n");
+		wbCheck(cudaMemcpy(&(finishedFeatures[numFinishedFeatures]), deviceFeatureBuffer, hostFeatureIndex * sizeof(feature), cudaMemcpyDeviceToHost));
+		numFinishedFeatures += hostFeatureIndex;
 		
 		willTerminate = !kernelRunning;
 
 		// if there are more images to analyze, start them doing so
 		if (handledImages < count) {
+			printf("Readying kernel %u\n", kernels + 1);
 			// clear feature buffer and copy next batch of images to device
-			wbCheck(cudaMemset(deviceFeatureBuffer, 0, FEATURE_BUFFER_SIZE * concImages));
+			wbCheck(cudaMemset(deviceFeatureBuffer, 0, TOTAL_FEATURE_BUFFER_SIZE));
 			wbCheck(cudaMemset(deviceImageBuffer, 0, IMAGE_SIZE * IMAGE_SIZE * concImages * sizeof(uint32_t)));
+			wbCheck(cudaMemset(deviceFeatureIndex, 0, sizeof(uint32_t)));
 			wbCheck(cudaMemcpy(deviceImageBuffer, &(hostImageBuffer[handledImages * IMAGE_SIZE * IMAGE_SIZE]), IMAGE_SIZE * IMAGE_SIZE * min(concImages, count - handledImages) * sizeof(uint32_t), cudaMemcpyHostToDevice));
 
 			dim3 dimGrid(min(concImages, count - handledImages), 1, 1);
-			// one warp per block, we can crank this later if it helps
 			dim3 dimBlock(THREADS_PER_BLOCK, 1, 1);
 
-			findFeatures <<<dimGrid, dimBlock>>>(deviceImageBuffer, deviceFeatureBuffer);
+			printf("Launching kernel %u\n", kernels + 1);
+
+			findFeatures <<<dimGrid, dimBlock>>>(deviceImageBuffer, deviceFeatureBuffer, deviceFeatureIndex);
 
 			handledImages += min(concImages, count - handledImages);
 		} else
 			kernelRunning = false;
-
-		#pragma omp parallel for
-		for (int32_t i = 0; i < concImages; i++) {
-			uint32_t id = omp_get_thread_num();
-			for (int32_t j = 0; j < FEATURES_IN_BUFFER; j++) {
-				feature packed = hostFeatureBuffer[j + FEATURES_IN_BUFFER * i];
-				if (packed.mag == 0 && j > 0) {
-					// there are no more features in this buffer, dump it into the combined buffer
-					#pragma omp critical
-					{
-						int32_t spaceInBuffer = finishedFeatureBufferSize - numFinishedFeatures;
-						// make the combined buffer bigger if necessary
-						if (spaceInBuffer < j) {
-							finishedFeatures = (feature*)realloc(finishedFeatures, (finishedFeatureBufferSize + concImages * FEATURES_IN_BUFFER) * sizeof(feature));
-							finishedFeatureBufferSize += concImages * FEATURES_IN_BUFFER;
-						}
-						memcpy(&(finishedFeatures[numFinishedFeatures]), &(hostFeatureBuffer[FEATURES_IN_BUFFER * i]), j * sizeof(feature));
-						numFinishedFeatures += j;
-					}
-					break;
-				}
-				else if (packed.mag == 0)
-					break;
-			}
-		}
-
-		// clear the host feature buffer
-		memset(hostFeatureBuffer, 0, FEATURE_BUFFER_SIZE * concImages);
 
 	} while (!willTerminate);
 
@@ -184,11 +160,10 @@ feature* findFeatures(uint32_t* hostImageBuffer, uint32_t count, uint32_t* numFe
 	// C cleanup
 	finishedFeatures = (feature*)realloc(finishedFeatures, numFinishedFeatures * sizeof(feature));
 
-	free(hostFeatureBuffer);
-
 	// CUDA cleanup
 	wbCheck(cudaFree(deviceFeatureBuffer));
 	wbCheck(cudaFree(deviceImageBuffer));
+	wbCheck(cudaFree(deviceFeatureIndex));
 
 	*numFeatures = numFinishedFeatures;
 	return finishedFeatures;

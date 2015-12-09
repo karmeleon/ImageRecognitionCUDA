@@ -1,19 +1,6 @@
 #include "haarfinder.cuh"
 
-#define GRANULARITY 1
-
-// packs a feature into a 64-bit datatype. if any of the coords are greater than 127, you're going to have a bad time
 __device__ feature packFeature(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint8_t type, int32_t mag) {
-	//// 7 bits each for x1, y1, x2, y2
-	//uint64_t out = 0;
-	//// bitwise operations are so satisfying
-	//out |= ((uint64_t)x1) << 57;
-	//out |= ((uint64_t)y1) << 50;
-	//out |= ((uint64_t)x2) << 43;
-	//out |= ((uint64_t)y2) << 36;
-	//out |= ((uint64_t)type) << 33;
-	//((int32_t*)&out)[0] = ((int32_t)mag);
-	//return out;
 	feature f;
 	f.x1 = x1;
 	f.y1 = y1;
@@ -62,11 +49,11 @@ __device__ void saveFeature(uint32_t* featureIndex, feature* features, feature f
 __device__ feature evalHorizEdge(uint32_t* sat, uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, int32_t threshold) {
 	uint8_t y3 = (y1 + y2) / 2;
 	
-	uint32_t whiteWeight = y3 - (y1 - 1);
-	uint32_t blackWeight = y2 - y3;
+	const uint32_t whiteWeight = y3 - (y1 - 1);
+	const uint32_t blackWeight = y2 - y3;
 
-	uint32_t white = regionMag(sat, x1, y1, x2, y3);
-	uint32_t black = regionMag(sat, x1, y3 + 1, x2, y2);
+	const uint32_t white = regionMag(sat, x1, y1, x2, y3);
+	const uint32_t black = regionMag(sat, x1, y3 + 1, x2, y2);
 
 	float diffWhite = (float)white / whiteWeight;
 	float diffBlack = (float)black / blackWeight;
@@ -81,11 +68,11 @@ __device__ feature evalHorizEdge(uint32_t* sat, uint8_t x1, uint8_t y1, uint8_t 
 __device__ feature evalVertEdge(uint32_t* sat, uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, int32_t threshold) {
 	uint8_t x3 = (x1 + x2) / 2;
 
-	uint32_t whiteWeight = x3 - (x1 - 1);
-	uint32_t blackWeight = x2 - x3;
+	const uint32_t whiteWeight = x3 - (x1 - 1);
+	const uint32_t blackWeight = x2 - x3;
 
-	uint32_t white = regionMag(sat, x1, y1, x3, y2);
-	uint32_t black = regionMag(sat, x3 + 1, y1, x2, y2);
+	const uint32_t white = regionMag(sat, x1, y1, x3, y2);
+	const uint32_t black = regionMag(sat, x3 + 1, y1, x2, y2);
 
 	float diffWhite = (float)white / whiteWeight;
 	float diffBlack = (float)black / blackWeight;
@@ -101,8 +88,8 @@ __device__ feature evalHorizLine(uint32_t* sat, uint8_t x1, uint8_t y1, uint8_t 
 	uint8_t y3 = (3 * y1 + y2) / 4;
 	uint8_t y4 = (y1 + 3 * y2) / 4;
 
-	uint32_t whiteWeight = y3 - y1 + y2 - (y4 - 1);
-	uint32_t blackWeight = y4 - y3;
+	const uint32_t whiteWeight = y3 - y1 + y2 - (y4 - 1);
+	const uint32_t blackWeight = y4 - y3;
 
 	uint32_t white = 0;
 	uint32_t black = 0;
@@ -129,8 +116,8 @@ __device__ feature evalVertLine(uint32_t* sat, uint8_t x1, uint8_t y1, uint8_t x
 	uint8_t x3 = (3 * x1 + x2) / 4;
 	uint8_t x4 = (x1 + 3 * x2) / 4;
 	
-	uint32_t whiteWeight = x3 - x1 + x2 - (x4 - 1);
-	uint32_t blackWeight = x4 - x3;
+	const uint32_t whiteWeight = x3 - x1 + x2 - (x4 - 1);
+	const uint32_t blackWeight = x4 - x3;
 
 	uint32_t white = 0;
 	uint32_t black = 0;
@@ -157,13 +144,13 @@ __device__ feature evalFourRectangle(uint32_t* sat, uint8_t x1, uint8_t y1, uint
 	uint8_t x3 = (x1 + x2) / 2;
 	uint8_t y3 = (y1 + y2) / 2;
 
-	uint32_t topWeight = y3 - (y1 - 1);
-	uint32_t bottomWeight = y2 - y3;
-	uint32_t leftWeight = x3 - (x1 - 1);
-	uint32_t rightWeight = x2 - x3;
+	const uint32_t topWeight = y3 - (y1 - 1);
+	const uint32_t bottomWeight = y2 - y3;
+	const uint32_t leftWeight = x3 - (x1 - 1);
+	const uint32_t rightWeight = x2 - x3;
 
-	uint32_t whiteWeight = topWeight * leftWeight + bottomWeight * rightWeight;
-	uint32_t blackWeight = topWeight * rightWeight + bottomWeight * leftWeight;
+	const uint32_t whiteWeight = topWeight * leftWeight + bottomWeight * rightWeight;
+	const uint32_t blackWeight = topWeight * rightWeight + bottomWeight * leftWeight;
 
 	uint32_t white = 0;
 	uint32_t black = 0;
@@ -188,15 +175,7 @@ __device__ feature evalFourRectangle(uint32_t* sat, uint8_t x1, uint8_t y1, uint
 }
 
 // finds haar-like features on the given SAT image. for best results, make sure sat is in shared memory.
-__device__ void haarfinder(uint32_t* sat, feature* features, int32_t threshold) {
-	// screw writing "unsigned long long int", use stdint.h instead
-	// we assume here that features is large enough to hold all the features we'll find and is in global memory
-
-	// the counter to keep track of where in the feature buffer we are
-	// ONLY ACCESS THIS ATOMICALLY
-	__shared__ uint32_t featureIndex[1];
-	featureIndex[0] = 0;
-
+__device__ void haarfinder(uint32_t* sat, feature* features, int32_t threshold, uint32_t* featureIndex) {
 	const uint32_t stride = blockDim.x;
 
 	for (uint32_t xSize = 4; xSize < IMAGE_SIZE; xSize++) {
@@ -206,8 +185,9 @@ __device__ void haarfinder(uint32_t* sat, feature* features, int32_t threshold) 
 			uint32_t xRegions = IMAGE_SIZE - xSize;
 			uint32_t yRegions = IMAGE_SIZE - ySize;
 			uint32_t numRegions = xRegions * yRegions;
+
 			// number of regions each thread processes
-			uint32_t numIterations = numRegions / stride;
+			uint32_t numIterations = (uint32_t)ceil((float)numRegions / stride);
 
 			for (uint32_t i = 0; i < numIterations; i++) {
 				uint32_t idx = i * stride + threadIdx.x;
@@ -219,19 +199,19 @@ __device__ void haarfinder(uint32_t* sat, feature* features, int32_t threshold) 
 
 					// evaluate Haar-like features
 					feature horizEdge = evalHorizEdge(sat, x1, y1, x2, y2, threshold);
-					saveFeature(&featureIndex[0], features, horizEdge);
+					saveFeature(featureIndex, features, horizEdge);
 
 					feature vertEdge = evalVertEdge(sat, x1, y1, x2, y2, threshold);
-					saveFeature(&featureIndex[0], features, vertEdge);
+					saveFeature(featureIndex, features, vertEdge);
 
 					feature horizLine = evalHorizLine(sat, x1, y1, x2, y2, threshold);
-					saveFeature(&featureIndex[0], features, horizLine);
+					saveFeature(featureIndex, features, horizLine);
 
 					feature vertLine = evalVertLine(sat, x1, y1, x2, y2, threshold);
-					saveFeature(&featureIndex[0], features, vertLine);
+					saveFeature(featureIndex, features, vertLine);
 
 					feature fourRectangle = evalFourRectangle(sat, x1, y1, x2, y2, threshold);
-					saveFeature(&featureIndex[0], features, fourRectangle);
+					saveFeature(featureIndex, features, fourRectangle);
 				}
 			}
 		}

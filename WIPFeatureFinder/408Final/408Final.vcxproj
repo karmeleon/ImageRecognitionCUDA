@@ -115,6 +115,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     </CudaLink>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <CudaCompile Include="dataloader.cu" />
     <CudaCompile Include="features.cu" />
     <CudaCompile Include="haarfinder.cu" />
     <CudaCompile Include="main.cu" />
@@ -122,10 +123,23 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.cuh" />
+    <ClInclude Include="dataloader.cuh" />
     <ClInclude Include="features.cuh" />
     <ClInclude Include="haarfinder.cuh" />
     <ClInclude Include="main.cuh" />
     <ClInclude Include="sat.cuh" />
+  </ItemGroup>
+	<ItemGroup>
+		<None Include="test_set_images"/>
+		<None Include="training_set_images"/>
+	</ItemGroup>
+  <ItemGroup>
+		<Content Include="test_set_images">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="training_set_images">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
