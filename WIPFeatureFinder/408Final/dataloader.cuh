@@ -8,3 +8,5 @@ void addPureBlack(uint32_t* buf);
 void addVertLine(uint32_t* buf);
 
 uint32_t* loadFromFile(uint32_t* count);
+
+unsigned char* read_mnist_labels();
