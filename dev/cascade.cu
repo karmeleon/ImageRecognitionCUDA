@@ -16,22 +16,22 @@ public:
 	{
 		feature _feature;
 		uint16_t _threshold;
-		uint16_t _error;
+		float _error;
 	};
 
-	std::vector<_weak_classifier> weak_classifier;
+	_weak_classifier* weak_classifier;
 	std::vector<float> alpha;
 
-	_strong_classifier(int stages)
+	void init(uint8_t stages)
 	{
-		weak_classifier.reserve(stages);
+		weak_classifier = (_weak_classifier*)malloc(stages*sizeof(_weak_classifier));
 		alpha.reserve(stages);
 	}
 
-	void append_classifier()
+	void append_classifier(int t)
 	{
 		_weak_classifier tmp;
-		weak_classifier.push_back(tmp);
+		weak_classifier[t] = tmp;
 	}
 
 	void append_alpha(float tmp)
@@ -39,16 +39,16 @@ public:
 		alpha.push_back(tmp);
 	}
 
-	void classify(int i)
+	/*void classify(int i)
 	{
 		std::cout << "Hello World! " << i << std::endl;
-	}
+	}*/
 };
 
 //////////////////////////////////////////////////
 
 //CUDA weak_classifier
-__global__ void weak_classifier(strong_classifier_dev._weak_classifier* weak_classifier, int* global_min, float* w, feature* f, uint8_t* l, uint16_t range, uint32_t num_examples)
+__global__ void weak_classifier(_strong_classifier* strong_classifier, int* global_min, float* w, feature* f, unsigned char* l, uint16_t range, uint32_t num_examples, int t)
 {
 	uint32_t i = blockDim.x*blockIdx.x + threadIdx.x;
 
@@ -104,15 +104,15 @@ __global__ void weak_classifier(strong_classifier_dev._weak_classifier* weak_cla
 	//Check for the minimum weighted error
 	if(weighted_int == atomicMin(global_min, weighted_int))
 	{
-		weak_classifier._threshold = min_theta;
-		weak_classifier._feature = f[i];
-		weak_classifier._error = min_weighted;
+		strong_classifier->weak_classifier[t]._threshold = min_theta;
+		strong_classifier->weak_classifier[t]._feature = f[i];
+		strong_classifier->weak_classifier[t]._error = min_weighted;
 	}
 }
 
 //////////////////////////////////////////////////
 
-_strong_classifier adaboost(feature* features, uint8_t* labels, uint32_t num_features, uint32_t num_examples, int stages)
+_strong_classifier* adaboost(feature* features, unsigned char* labels, uint32_t num_features, uint32_t num_examples, uint8_t stages)
 {
 	//Initialize error rate
 	float error = 0;
@@ -125,22 +125,24 @@ _strong_classifier adaboost(feature* features, uint8_t* labels, uint32_t num_fea
 	uint16_t theta = 5000;
 
 	//Strong classifier
-	_strong_classifier* strong_classifier (stages);
+	_strong_classifier* strong_classifier;
+	strong_classifier->init(stages);
 
 	//CUDA allocations
-	dim3 dimGrid(ceil((numFeatures)/BLOCK_SIZE), 1, 1);
+	dim3 dimGrid(ceil((num_features)/BLOCK_SIZE), 1, 1);
 	dim3 dimBlock(BLOCK_SIZE, 1, 1);
 
 	feature* f;
-	uint8_t* l;
-	_strong_classifier* strong_classifier_dev (stages);
+	unsigned char* l;
+	_strong_classifier* strong_classifier_dev;
+	strong_classifier_dev->init(stages);
 	float* w_dev;
 	int* global_min;
 
 	//Allocate space on GPU
-	cudaError_t cuda_error[3];
-	cuda_error[0] = cudaMalloc((void**) &strong_classifier_dev.weak_classifier[0], sizeof(strong_classifier._weak_classifier[0]));
-	cuda_error[1] = cudaMalloc((void**) &f, numFeatures*sizeof(feature));
+	cudaError_t cuda_error[4];
+	cuda_error[0] = cudaMalloc((void**) &strong_classifier_dev, sizeof(_strong_classifier));
+	cuda_error[1] = cudaMalloc((void**) &f, num_features*sizeof(feature));
 	cuda_error[2] = cudaMalloc((void**) &l, num_examples*sizeof(unsigned char));
 	cuda_error[3] = cudaMalloc((void**) &w_dev, num_examples*sizeof(float));
 	for(int i = 0; i < 4; i++)
@@ -153,8 +155,8 @@ _strong_classifier adaboost(feature* features, uint8_t* labels, uint32_t num_fea
 
 	//Copy data to GPU
 	//cuda_error[0] = cudaMemcpy(strong_classifier_dev.weak_classifier, strong_classifier.weak_classifier, numFeatures*sizeof(_weak_classifier));
-	cuda_error[0] = cudaMemcpy(f, features, numFeatures*sizeof(feature), cudaMemcpyHostToDevice);
-	cuda_error[1] = cudaMemcpy(l, labels, num_examples*sizeof(uint8_t), cudaMemcpyHostToDevice);
+	cuda_error[0] = cudaMemcpy(f, features, num_features*sizeof(feature), cudaMemcpyHostToDevice);
+	cuda_error[1] = cudaMemcpy(l, labels, num_examples*sizeof(unsigned char), cudaMemcpyHostToDevice);
 	for(int i = 0; i < 2; i++)
 	{
 		if(cuda_error[i] != 0)
@@ -180,7 +182,7 @@ _strong_classifier adaboost(feature* features, uint8_t* labels, uint32_t num_fea
 	for(int t = 0; t < stages; t++)
 	{
 		//Append a new weak classifier to the strong classifier
-		strong_classifier.append_classifier();
+		strong_classifier->append_classifier(t);
 
 		//Normalize weights to produce a distribution
 		for(int i = 0; i < num_examples; i++)
@@ -193,7 +195,7 @@ _strong_classifier adaboost(feature* features, uint8_t* labels, uint32_t num_fea
 		}
 
 		//Train weak classifier h_j for each feature j
-		cuda_error[0] = cudaMemcpy(strong_classifier_dev.weak_classifier[t], strong_classifier.weak_classifier[t], sizeof(_weak_classifier), cudaMemcpyHostToDevice);
+		cuda_error[0] = cudaMemcpy(strong_classifier_dev, strong_classifier, sizeof(_strong_classifier), cudaMemcpyHostToDevice);
 		cuda_error[1] = cudaMemcpy(w_dev, w, num_examples*sizeof(float), cudaMemcpyHostToDevice);
 		for(int i = 0; i < 2; i++)
 		{
@@ -203,10 +205,10 @@ _strong_classifier adaboost(feature* features, uint8_t* labels, uint32_t num_fea
 			}
 		}
 
-		weak_classifier<<<dimGrid, dimBlock>>>(strong_classifier_dev.weak_classifier, global_min, w_dev, f, l, theta, num_examples);
+		weak_classifier<<<dimGrid, dimBlock>>>(strong_classifier_dev, global_min, w_dev, f, l, theta, num_examples, t);
 
 		cudaDeviceSynchronize();
-		cuda_error[0] = cudaMemcpy(strong_classifier.weak_classifier[t], strong_classifier_dev.weak_classifier[t], sizeof(_weak_classifier), cudaMemcpyDeviceToHost);
+		cuda_error[0] = cudaMemcpy(strong_classifier, strong_classifier_dev, sizeof(_strong_classifier), cudaMemcpyDeviceToHost);
 		if(cuda_error[0] != 0)
 		{
 			std::cout << "cudaMemcpy dev2host error: " << cudaGetErrorString(cuda_error[0]) << std::endl;
@@ -215,7 +217,7 @@ _strong_classifier adaboost(feature* features, uint8_t* labels, uint32_t num_fea
 		//Update error and weights
 		for(int i = 0; i < num_examples; i++)
 		{
-			if(abs(features[i].mag - 127*(features[i].x2 - features[i].x1)*(features[i].y2 - features[i].y1)) < strong_classifier.weak_classifier[t].threshold)
+			if(abs(features[i].mag - 127*(features[i].x2 - features[i].x1)*(features[i].y2 - features[i].y1)) < strong_classifier->weak_classifier[t]._threshold)
 			{
 				if(labels[i] == 1)
 				{
@@ -239,7 +241,7 @@ _strong_classifier adaboost(feature* features, uint8_t* labels, uint32_t num_fea
 			}
 		}
 
-		strong_classifier.append_alpha(log((1 - error)/error));
+		strong_classifier->append_alpha(log((1 - error)/error));
 	}
 
 	return strong_classifier;
@@ -247,7 +249,7 @@ _strong_classifier adaboost(feature* features, uint8_t* labels, uint32_t num_fea
 
 //////////////////////////////////////////////////
 
-int train_cascade(feature* pos_features, feature* neg_features, uint8_t* label, uint32_t num_pos_features, uint32_t num_neg_features, uint32_t num_pos_examples, uint32_t num_neg_examples)
+int train_cascade(feature* pos_features, feature* neg_features, unsigned char* label, uint32_t num_pos_features, uint32_t num_neg_features, uint32_t num_pos_examples, uint32_t num_neg_examples)
 {
 	feature* features = (feature*)malloc((num_pos_features + num_neg_features)*sizeof(feature));
 	for(uint32_t i = 0; i < num_pos_features; i++)
@@ -263,8 +265,9 @@ int train_cascade(feature* pos_features, feature* neg_features, uint8_t* label, 
 	uint32_t num_examples = num_pos_examples + num_neg_examples;
 
 	//Train cascade classifier
-	int stages = 50;
-	_strong_classifier classifier (stages);
+	uint8_t stages = 50;
+	_strong_classifier* classifier;
+	classifier->init(stages);
 	classifier = adaboost(features, label, num_features, num_examples, stages);
 
 	free(features);
