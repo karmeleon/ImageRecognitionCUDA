@@ -5,6 +5,8 @@
     <CudaCompile Include="haarfinder.cu" />
     <CudaCompile Include="main.cu" />
     <CudaCompile Include="sat.cu" />
+    <CudaCompile Include="dataloader.cu" />
+    <CudaCompile Include="serial_features.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.cuh" />
@@ -12,9 +14,12 @@
     <ClInclude Include="haarfinder.cuh" />
     <ClInclude Include="main.cuh" />
     <ClInclude Include="sat.cuh" />
+    <ClInclude Include="dataloader.cuh" />
+    <ClInclude Include="serial_features.cuh" />
   </ItemGroup>
   <ItemGroup>
     <None Include="test_set_images" />
     <None Include="training_set_images" />
+    <None Include="training_set_labels" />
   </ItemGroup>
 </Project>

@@ -1,4 +1,6 @@
 #define IMAGE_SIZE 28
+// the average pixel difference to trigger a feature
+#define THRESHOLD 150
 
 // features
 #define HEDGE 0

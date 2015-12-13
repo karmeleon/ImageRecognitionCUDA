@@ -1,11 +1,11 @@
 ﻿  Compiling CUDA source file features.cu...
   
-  C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -gencode=arch=compute_50,code=\"sm_50,compute_50\" --use-local-env --cl-version 2013 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64" -rdc=true -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include"     --keep-dir x64\Release -maxrregcount=0  --machine 64 --compile -cudart static -Xcompiler "/openmp"     -DWIN32 -DWIN64 -DNDEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Ox /Zi  /MT /GR-" -o x64\Release\features.cu.obj "C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final\features.cu" 
+  C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -gencode=arch=compute_50,code=\"sm_50,compute_50\" -gencode=arch=compute_30,code=\"sm_30,compute_30\" --use-local-env --cl-version 2013 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64" -rdc=true -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include"     --keep-dir x64\Release -maxrregcount=0  --machine 64 --compile -cudart static -Xcompiler "/openmp"     -DWIN32 -DWIN64 -DNDEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Ox /Zi  /MT /GR-" -o x64\Release\features.cu.obj "C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final\features.cu" 
   features.cu
-C:/Users/Shawn/google drive/visual studio 2013/Projects/408Final/408Final/features.cu(66): warning C4244: 'initializing' : conversion from 'double' to 'int32_t', possible loss of data
-C:/Users/Shawn/google drive/visual studio 2013/Projects/408Final/408Final/features.cu(78): warning C4018: '<' : signed/unsigned mismatch
+C:/Users/Shawn/google drive/visual studio 2013/Projects/408Final/408Final/features.cu(63): warning C4244: 'initializing' : conversion from 'double' to 'uint32_t', possible loss of data
+C:/Users/Shawn/google drive/visual studio 2013/Projects/408Final/408Final/features.cu(121): warning C4018: '>' : signed/unsigned mismatch
   
-  C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -dlink -o x64\Release\408Final.device-link.obj -Xcompiler "/EHsc /W3 /nologo /Ox /Zi  /MT /GR-" -L"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\lib\x64" cudart.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib  -gencode=arch=compute_50,code=sm_50  --machine 64 x64\Release\features.cu.obj x64\Release\haarfinder.cu.obj x64\Release\main.cu.obj x64\Release\sat.cu.obj 
+  C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -dlink -o x64\Release\408Final.device-link.obj -Xcompiler "/EHsc /W3 /nologo /Ox /Zi  /MT /GR-" -L"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\lib\x64" cudart.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib  -gencode=arch=compute_50,code=sm_50 -gencode=arch=compute_30,code=sm_30  --machine 64 x64\Release\dataloader.cu.obj x64\Release\features.cu.obj x64\Release\haarfinder.cu.obj x64\Release\main.cu.obj x64\Release\sat.cu.obj x64\Release\serial_features.cu.obj 
   cudart.lib
   kernel32.lib
   user32.lib
@@ -19,10 +19,12 @@ C:/Users/Shawn/google drive/visual studio 2013/Projects/408Final/408Final/featur
   uuid.lib
   odbc32.lib
   odbccp32.lib
+  dataloader.cu.obj
   features.cu.obj
   haarfinder.cu.obj
   main.cu.obj
   sat.cu.obj
+  serial_features.cu.obj
   LINK : /LTCG specified but no code generation required; remove /LTCG from the link command line to improve linker performance
   408Final.vcxproj -> C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\x64\Release\408Final.exe
   copy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\cudart*.dll" "C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\x64\Release\"
