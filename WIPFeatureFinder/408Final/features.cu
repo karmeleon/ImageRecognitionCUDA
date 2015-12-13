@@ -1,11 +1,11 @@
 #include "features.cuh"
 
-#define FEATURES_PER_IMAGE (1600 * 5)
+#define FEATURES_PER_IMAGE (2500 * 5)
 #define FEATURE_BUFFER_SIZE_PER_IMAGE (FEATURES_PER_IMAGE * sizeof(feature))
 #define TOTAL_FEATURE_BUFFER_SIZE (FEATURE_BUFFER_SIZE_PER_IMAGE * concImages)
 #define TOTAL_FEATURE_BUFFER_COUNT (FEATURES_PER_IMAGE * concImages)
 // fraction of free VRAM to use
-#define FREE_VRAM_USAGE .9
+#define FREE_VRAM_USAGE .8
 #define THREADS_PER_BLOCK 32
 
 __global__ void findFeatures(uint32_t* imageBuffer, feature* featureBuffer, uint32_t* featureIndex) {
