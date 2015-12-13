@@ -3,7 +3,7 @@
 int main() {
 	printf("Loading images from disk. This will take a few seconds.\n");
 	/*uint32_t count, numFeatures;
-	uint32_t* images = loadAllFromFile(&count);
+	uint32_t* images = loadAllFromFile(&count, "training_set_images");
 	printf("Loaded %u images from file (%u MB).\n", count, count * sizeof(uint32_t*) * IMAGE_SIZE * IMAGE_SIZE / 1024 / 1024);*/
 
 	uint32_t positiveCount, negativeCount, numPositiveFeatures, numNegativeFeatures;

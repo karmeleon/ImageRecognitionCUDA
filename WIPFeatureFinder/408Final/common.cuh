@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math_functions.h>
+#include <string>
 #include <thread>
 #include <omp.h>
 #include <sys/timeb.h>
