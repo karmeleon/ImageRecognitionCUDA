@@ -125,7 +125,7 @@ _strong_classifier* adaboost(feature* features, unsigned char* labels, uint32_t 
 	uint16_t theta = 5000;
 
 	//Strong classifier
-	_strong_classifier* strong_classifier;
+	_strong_classifier* strong_classifier = (_strong_classifier*)malloc(sizeof(_strong_classifier));;
 	strong_classifier->init(stages);
 
 	//CUDA allocations
@@ -134,10 +134,10 @@ _strong_classifier* adaboost(feature* features, unsigned char* labels, uint32_t 
 
 	feature* f;
 	unsigned char* l;
-	_strong_classifier* strong_classifier_dev;
+	_strong_classifier* strong_classifier_dev = (_strong_classifier*)malloc(sizeof(_strong_classifier));;
 	strong_classifier_dev->init(stages);
 	float* w_dev;
-	int* global_min;
+	int* global_min = (int*)malloc(sizeof(int));
 
 	//Allocate space on GPU
 	cudaError_t cuda_error[4];
