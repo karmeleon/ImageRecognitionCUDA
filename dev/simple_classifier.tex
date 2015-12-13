@@ -1,0 +1,130 @@
+\documentclass[11pt]{article}
+\usepackage{graphicx,mathtools}
+\usepackage{enumerate}
+\usepackage{algorithm, algpseudocode}
+\usepackage[charter]{mathdesign}
+\usepackage{hyperref}
+\usepackage{arydshln}
+\dashlinedash 0.75pt
+\dashlinegap 1.5pt
+
+% =========================================================
+
+\begin{document}
+\addtolength{\topmargin}{-1.5in}
+\setlength{\footskip}{200pt}
+\parindent 1.5em \itemsep 3ex plus 0.5fil
+\def\arraystretch{1.2}
+ 
+ \textbf{\newline\newline\newline\newline\newline\newline\newline\newline\newline\newline\newline\newline\newline\newline\newline
+ 	    \newline\newline\newline\newline\newline\newline\newline}
+ \textbf{Use an ensemble of simple classifiers
+ 	    $h_{j} = \begin{cases} 1 & \quad |f_{i}(x) - input_{i}(x)| \leq \theta\\ 0 & \quad \text{else} \end{cases}$
+ 	    On their own, the simple classifiers will yield high error rates. However, this can be fixed by using ensemble learning as well as
+	    choosing the most impactful ones through the ADABoost algorithm. Using this strategy, we can semi-quickly create a strong
+	    classifier
+	    $H_{t} = \begin{cases} 1 & \quad \sum{\alpha_{j}h_{j}(x)} \geq \frac{1}{2}\sum{\alpha_{j}}\\ 0 & \quad \text{else} \end{cases}$
+	    \newline\newline}
+ 
+	% weak_classifier() 
+	\begin{algorithm}[]
+  	\caption{$\text{Weak Classifier}$}
+  	\begin{algorithmic}[0]
+  	\Procedure{$weak\_classifier(input[][], output[], label[], f_{i}, lo\_rng, hi\_rng)$
+	\newline $\textbf{inputs: }\textit{input - }\text{set of N input image vectors} \newline
+			\textit{\qquad\quad\;\, output - }\text{set of N output decisions (-1 or 1)} \newline
+			\textit{\qquad\quad\;\, label - }\text{set of N true labels of input images (-1 or 1)} \newline
+			\textit{\qquad\quad\;\, $f_{i}$ - }\text{feature vector} \newline
+			\textit{\qquad\quad\;\, lo$\_$rng - }\text{initial low threshold} \newline
+			\textit{\qquad\quad\;\, hi$\_$rng - }\text{initial high threshold}$}{}
+	\State $\theta_{lo} \gets lo\_rng, \theta_{mid} \gets \lfloor\frac{(lo\_rng + hi\_rng)}{2}\rfloor, \theta_{hi} \gets hi\_rng$
+	\While {($\theta_{lo} \neq \theta_{hi}$)}
+	\State $error \gets \emptyset, e_{lo} \gets 0, e_{mid} \gets 0, e_{hi} \gets 0$
+	\For {($i = 0 \rightarrow input.size()$)}
+	\For {($\textit{each subregion x}$)}
+	\State $\text{\#Determine output decision based on three potential thresholds.}$
+	\If {($|f_{i} - input[i](x)| \leq \theta_{lo}$)}
+	\State $output[i] \gets 1$
+	\State $error[i] \gets 0$
+	\ElsIf {($|f_{i} - input[i](x)| \leq \theta_{mid}$)}
+	\State $output[i] \gets 1$
+	\State $error[i] \gets 1$
+	\ElsIf {($|f_{i} - input[i](x)| \leq \theta_{hi}$)}
+	\State $output[i] \gets 1$
+	\State $error[i] \gets 2$
+	\EndIf
+	\EndFor
+	\If {($output[i] \equiv 0$)}
+	\State $output[i] \gets -1$
+	\State $error[i] \gets -1$
+	\EndIf
+	\State $\text{\#Find the number of misclassifications for each potential threshold.}$
+	\If {($error[i] \equiv -1$)}
+	\If {($output[i] \neq label[i]$)}
+	\State $e_{lo}++$
+	\State $e_{mid}++$
+	\State $e_{hi}++$
+	\EndIf
+	\ElsIf {($error[i] \equiv 0$)}
+	\If {($output[i] \neq label[i]$)}
+	\State $e_{lo}++$
+	\State $e_{mid}++$
+	\State $e_{hi}++$
+	\EndIf
+	\ElsIf {($error[i] \equiv 1$)}
+	\If {($output[i] \equiv label[i]$)}
+	\State $e_{low}++$
+	\Else {}
+	\State $e_{mid}++$
+	\State $e_{hi}++$
+	\EndIf
+	\algstore{weak_classifier}
+	\end{algorithmic}
+	\center \textbf{(Continued on next page)}
+	\end{algorithm}
+
+	\newpage
+
+	\begin{algorithm}
+	\center \textbf{(Continued from previous page)}
+	\begin{algorithmic}
+	\algrestore{weak_classifier}
+	\ElsIf {($error[i] \equiv 2$)}
+	\If {($output[i] \equiv label[i]$)}
+	\State $e_{low}++$
+	\State $e_{mid}++$
+	\Else {}
+	\State $e_{hi}++$
+	\EndIf
+	\EndIf
+	\EndFor
+	\State $\text{\#Compute new threshold bounds based on number of misclassifications.}$
+	\If {($e_{lo} \leq e_{mid} \:\&\&\: e_{mid} \leq e_{hi}$)}
+	\State $\theta_{lo} \gets \theta_{lo}$
+	\State $\theta_{hi} \gets \theta_{mid}$
+	\State $\theta_{mid} \gets \lfloor\frac{(\theta_{low} + \theta_{hi})}{2}\rfloor$
+	\ElsIf {($e_{mid} \leq e_{lo} \:\&\&\: e_{hi} \leq e_{mid}$)}
+	\State $\theta_{lo} \gets \theta_{mid}$
+	\State $\theta_{hi} \gets \theta_{hi}$
+	\State $\theta_{mid} \gets \lfloor\frac{(\theta_{low} + \theta_{hi})}{2}\rfloor$
+	\ElsIf {($e_{mid} \geq e_{lo} \:\&\&\: e_{mid} \geq e_{hi}$)}
+	\If {($e_{lo} \equiv min(e_{lo}, e_{hi})$)}
+	\State $\theta_{lo} \gets \theta_{lo}$
+	\State $\theta_{hi} \gets \theta_{mid}$
+	\Else {}
+	\State $\theta_{lo} \gets \theta_{mid}$
+	\State $\theta_{hi} \gets \theta_{hi}$
+	\EndIf
+	\State $\theta_{mid} \gets \lfloor\frac{(\theta_{low} + \theta_{hi})}{2}\rfloor$
+	\ElsIf {($e_{mid} \leq e_{lo} \:\&\&\: e_{mid} \leq e_{hi}$)}
+	\State $\theta_{lo} \gets \theta_{mid} - \lfloor\frac{\theta_{mid}}{2}\rfloor$
+	\State $\theta_{hi} \gets \theta_{mid} + \lfloor\frac{\theta_{mid}}{2}\rfloor$
+	\EndIf
+	\EndWhile
+	\State $\textit{return $\theta_{lo}$}$
+  	\EndProcedure
+  	\end{algorithmic}
+	\end{algorithm}
+
+\end{document}
+% =========================================================
