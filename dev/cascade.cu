@@ -242,7 +242,17 @@ _strong_classifier* adaboost(feature* features, unsigned char* labels, uint32_t 
 		}
 
 		strong_classifier->append_alpha(log((1 - error)/error));
+
+		//Display info about training stage
+		cout << "*****************************************************" << endl;
+		cout << "* Stage " << t << " done with error rate: " << strong_classifier->weak_classifier[t]._error << endl;
+		cout << "*****************************************************" << endl;
 	}
+
+	cudaFree(strong_classifier_dev);
+	cudaFree(f);
+	cudaFree(l);
+	cudaFree(w_dev);
 
 	return strong_classifier;
 }
@@ -252,22 +262,30 @@ _strong_classifier* adaboost(feature* features, unsigned char* labels, uint32_t 
 int train_cascade(feature* pos_features, feature* neg_features, unsigned char* label, uint32_t num_pos_features, uint32_t num_neg_features, uint32_t num_pos_examples, uint32_t num_neg_examples)
 {
 	feature* features = (feature*)malloc((num_pos_features + num_neg_features)*sizeof(feature));
-	for(uint32_t i = 0; i < num_pos_features; i++)
+	/*for(uint32_t i = 0; i < num_pos_features; i++)
 	{
 		features[i] = pos_features[i];
 	}
 	for(uint32_t i = 0; i < num_neg_features; i++)
 	{
 		features[num_pos_features + i] = neg_features[i];
-	}
+	}*/
+
+	memcpy(features, pos_features, num_pos_examples*sizeof(feature));
+	memcpy(&features[num_pos_examples], neg_features, num_neg_features*sizeof(feature));
 
 	uint32_t num_features = num_pos_features + num_neg_features;
 	uint32_t num_examples = num_pos_examples + num_neg_examples;
 
 	//Train cascade classifier
 	uint8_t stages = 50;
-	_strong_classifier* classifier;
+	_strong_classifier* classifier = (_strong_classifier*)malloc(sizeof(_strong_classifier));
 	classifier->init(stages);
+
+	cout << "-------------------" << endl;
+	cout << "Training classifier" << endl;
+	cout << "-------------------" << endl;
+
 	classifier = adaboost(features, label, num_features, num_examples, stages);
 
 	free(features);
