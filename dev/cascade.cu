@@ -138,14 +138,17 @@ _strong_classifier* adaboost(feature* features, unsigned char* labels, uint32_t 
 	strong_classifier_dev->init(stages);
 	float* w_dev;
 	int* global_min = (int*)malloc(sizeof(int));
+	*global_min = INT_MAX;
+	int* global_min_dev;
 
 	//Allocate space on GPU
-	cudaError_t cuda_error[4];
+	cudaError_t cuda_error[5];
 	cuda_error[0] = cudaMalloc((void**) &strong_classifier_dev, sizeof(_strong_classifier));
 	cuda_error[1] = cudaMalloc((void**) &f, num_features*sizeof(feature));
 	cuda_error[2] = cudaMalloc((void**) &l, num_examples*sizeof(unsigned char));
 	cuda_error[3] = cudaMalloc((void**) &w_dev, num_examples*sizeof(float));
-	for(int i = 0; i < 4; i++)
+	cuda_error[4] = cudaMalloc((void**) &global_min_dev, sizeof(int));
+	for(int i = 0; i < 5; i++)
 	{
 		if(cuda_error[i] != 0)
 		{
@@ -166,11 +169,11 @@ _strong_classifier* adaboost(feature* features, unsigned char* labels, uint32_t 
 	}
 
 	//Set the global min value on the GPU
-	cuda_error[0] = cudaMemset(global_min, INT_MAX, sizeof(int));
+	/*cuda_error[0] = cudaMemset(global_min, INT_MAX, sizeof(int));
 	if(cuda_error[0] != 0)
 	{
 		std::cout << "cudaMemset error: " << cudaGetErrorString(cuda_error[0]) << std::endl;
-	}
+	}*/
 
 	//Initialize weight distribution
 	for(int i = 0; i < num_examples; i++)
@@ -197,7 +200,8 @@ _strong_classifier* adaboost(feature* features, unsigned char* labels, uint32_t 
 		//Train weak classifier h_j for each feature j
 		cuda_error[0] = cudaMemcpy(strong_classifier_dev, strong_classifier, sizeof(_strong_classifier), cudaMemcpyHostToDevice);
 		cuda_error[1] = cudaMemcpy(w_dev, w, num_examples*sizeof(float), cudaMemcpyHostToDevice);
-		for(int i = 0; i < 2; i++)
+		cuda_error[2] = cudaMemcpy(global_min_dev, global_min, sizeof(int));
+		for(int i = 0; i < 3; i++)
 		{
 			if(cuda_error[i] != 0)
 			{
@@ -205,7 +209,7 @@ _strong_classifier* adaboost(feature* features, unsigned char* labels, uint32_t 
 			}
 		}
 
-		weak_classifier<<<dimGrid, dimBlock>>>(strong_classifier_dev, global_min, w_dev, f, l, theta, num_examples, t);
+		weak_classifier<<<dimGrid, dimBlock>>>(strong_classifier_dev, global_min_dev, w_dev, f, l, theta, num_examples, t);
 
 		cudaDeviceSynchronize();
 		cuda_error[0] = cudaMemcpy(strong_classifier, strong_classifier_dev, sizeof(_strong_classifier), cudaMemcpyDeviceToHost);
