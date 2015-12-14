@@ -30,9 +30,9 @@ int ReverseInt(int i) {
 	return((int)ch1 << 24) + ((int)ch2 << 16) + ((int)ch3 << 8) + ch4;
 }
 
-uint32_t* loadAllFromFile(uint32_t* count, string full_path) {
+uint32_t* loadAllFromFile(uint32_t* count) {
 	std::ifstream file;
-	file.open(full_path, std::ifstream::in | std::ifstream::binary);
+	file.open("training_set_images", std::ifstream::in | std::ifstream::binary);
 	if (file.is_open()) {
 		int magic_number = 0;
 		int number_of_images = 0;
@@ -54,7 +54,7 @@ uint32_t* loadAllFromFile(uint32_t* count, string full_path) {
 			file.read((char*)&temp, sizeof(char));
 			images[i] = temp;
 		}
-		
+
 		file.close();
 
 		*count = number_of_images;
@@ -66,9 +66,11 @@ uint32_t* loadAllFromFile(uint32_t* count, string full_path) {
 	}
 }
 
-void loadLabelFromFile(uint8_t label, uint32_t** positive, uint32_t* positiveCount, uint32_t** negative, uint32_t* negativeCount) {
+void loadLabelFromFile(unsigned char** outLabels, uint8_t label, uint32_t** positive, uint32_t* positiveCount, uint32_t** negative, uint32_t* negativeCount) {
 	// read labels
-	uint8_t* labels = read_mnist_labels("training_set_images");
+	uint8_t* labels = read_mnist_labels();
+
+	*outLabels = labels;
 
 	// read training set header
 	std::ifstream file;
@@ -124,10 +126,10 @@ void loadLabelFromFile(uint8_t label, uint32_t** positive, uint32_t* positiveCou
 	}
 }
 
-unsigned char* read_mnist_labels(string full_path) {
+unsigned char* read_mnist_labels() {
 	typedef unsigned char uchar;
 
-	std::ifstream file( full_path );
+	std::ifstream file("training_set_labels");
 
 	if (file.is_open()) {
 		int magic_number = 0;
@@ -143,7 +145,7 @@ unsigned char* read_mnist_labels(string full_path) {
 		for (int i = 0; i < number_of_labels; i++) {
 			file.read((char*)&_dataset[i], 1);
 			/*if (_dataset[i] == 0)
-				_dataset[i] = 1;
+			_dataset[i] = 1;
 			else _dataset[i] = 0;*/
 		}
 		return _dataset;

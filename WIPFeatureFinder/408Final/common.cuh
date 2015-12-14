@@ -1,6 +1,6 @@
 #define IMAGE_SIZE 28
 // the average pixel difference to trigger a feature
-#define THRESHOLD 150
+#define THRESHOLD 200
 
 // features
 #define HEDGE 0
@@ -22,7 +22,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math_functions.h>
-#include <string>
 #include <thread>
 #include <omp.h>
 #include <sys/timeb.h>

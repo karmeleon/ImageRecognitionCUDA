@@ -1,0 +1,74 @@
+﻿  Compiling CUDA source file cascade.cu...
+  
+  C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -gencode=arch=compute_50,code=\"sm_50,compute_50\" -gencode=arch=compute_30,code=\"sm_30,compute_30\" --use-local-env --cl-version 2013 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64" -rdc=true -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" --source-in-ptx  -lineinfo  --keep-dir x64\FastDebug -maxrregcount=0  --machine 64 --compile -cudart static -Xcompiler "/openmp"     -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MTd /GR" -o x64\FastDebug\cascade.cu.obj "C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final\cascade.cu" 
+C:/Users/Shawn/google drive/visual studio 2013/Projects/408Final/408Final/cascade.cu(44): warning : variable "tmp" is used before its value is set
+C:/Users/Shawn/google drive/visual studio 2013/Projects/408Final/408Final/cascade.cu(44): warning : variable "tmp" is used before its value is set
+C:/Users/Shawn/google drive/visual studio 2013/Projects/408Final/408Final/cascade.cu(44): warning : variable "tmp" is used before its value is set
+C:/Users/Shawn/google drive/visual studio 2013/Projects/408Final/408Final/cascade.cu(44): warning : variable "tmp" is used before its value is set
+  cascade.cu
+C:/Users/Shawn/google drive/visual studio 2013/Projects/408Final/408Final/cascade.cu(157): warning C4244: 'argument' : conversion from 'double' to 'unsigned int', possible loss of data
+C:/Users/Shawn/google drive/visual studio 2013/Projects/408Final/408Final/cascade.cu(213): warning C4018: '<' : signed/unsigned mismatch
+C:/Users/Shawn/google drive/visual studio 2013/Projects/408Final/408Final/cascade.cu(215): warning C4244: '=' : conversion from 'uint32_t' to 'float', possible loss of data
+C:/Users/Shawn/google drive/visual studio 2013/Projects/408Final/408Final/cascade.cu(225): warning C4018: '<' : signed/unsigned mismatch
+C:/Users/Shawn/google drive/visual studio 2013/Projects/408Final/408Final/cascade.cu(229): warning C4018: '<' : signed/unsigned mismatch
+C:/Users/Shawn/google drive/visual studio 2013/Projects/408Final/408Final/cascade.cu(261): warning C4018: '<' : signed/unsigned mismatch
+C:/Users/Shawn/google drive/visual studio 2013/Projects/408Final/408Final/cascade.cu(267): warning C4244: '*=' : conversion from 'double' to 'float', possible loss of data
+C:/Users/Shawn/google drive/visual studio 2013/Projects/408Final/408Final/cascade.cu(271): warning C4244: '*=' : conversion from 'double' to 'float', possible loss of data
+C:/Users/Shawn/google drive/visual studio 2013/Projects/408Final/408Final/cascade.cu(278): warning C4244: '*=' : conversion from 'double' to 'float', possible loss of data
+C:/Users/Shawn/google drive/visual studio 2013/Projects/408Final/408Final/cascade.cu(282): warning C4244: '*=' : conversion from 'double' to 'float', possible loss of data
+c:\users\shawn\google drive\visual studio 2013\projects\408final\408final\cascade.cu(44): warning C4700: uninitialized local variable 'tmp' used
+  Compiling CUDA source file dataloader.cu...
+  
+  C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -gencode=arch=compute_50,code=\"sm_50,compute_50\" -gencode=arch=compute_30,code=\"sm_30,compute_30\" --use-local-env --cl-version 2013 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64" -rdc=true -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" --source-in-ptx  -lineinfo  --keep-dir x64\FastDebug -maxrregcount=0  --machine 64 --compile -cudart static -Xcompiler "/openmp"     -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MTd /GR" -o x64\FastDebug\dataloader.cu.obj "C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final\dataloader.cu" 
+  dataloader.cu
+  Compiling CUDA source file features.cu...
+  
+  C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -gencode=arch=compute_50,code=\"sm_50,compute_50\" -gencode=arch=compute_30,code=\"sm_30,compute_30\" --use-local-env --cl-version 2013 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64" -rdc=true -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" --source-in-ptx  -lineinfo  --keep-dir x64\FastDebug -maxrregcount=0  --machine 64 --compile -cudart static -Xcompiler "/openmp"     -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MTd /GR" -o x64\FastDebug\features.cu.obj "C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final\features.cu" 
+  features.cu
+C:/Users/Shawn/google drive/visual studio 2013/Projects/408Final/408Final/features.cu(63): warning C4244: 'initializing' : conversion from 'double' to 'uint32_t', possible loss of data
+C:/Users/Shawn/google drive/visual studio 2013/Projects/408Final/408Final/features.cu(121): warning C4018: '>' : signed/unsigned mismatch
+  Compiling CUDA source file haarfinder.cu...
+  
+  C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -gencode=arch=compute_50,code=\"sm_50,compute_50\" -gencode=arch=compute_30,code=\"sm_30,compute_30\" --use-local-env --cl-version 2013 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64" -rdc=true -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" --source-in-ptx  -lineinfo  --keep-dir x64\FastDebug -maxrregcount=0  --machine 64 --compile -cudart static -Xcompiler "/openmp"     -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MTd /GR" -o x64\FastDebug\haarfinder.cu.obj "C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final\haarfinder.cu" 
+  haarfinder.cu
+  Compiling CUDA source file main.cu...
+  
+  C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -gencode=arch=compute_50,code=\"sm_50,compute_50\" -gencode=arch=compute_30,code=\"sm_30,compute_30\" --use-local-env --cl-version 2013 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64" -rdc=true -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" --source-in-ptx  -lineinfo  --keep-dir x64\FastDebug -maxrregcount=0  --machine 64 --compile -cudart static -Xcompiler "/openmp"     -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MTd /GR" -o x64\FastDebug\main.cu.obj "C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final\main.cu" 
+  main.cu
+  Compiling CUDA source file sat.cu...
+  
+  C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -gencode=arch=compute_50,code=\"sm_50,compute_50\" -gencode=arch=compute_30,code=\"sm_30,compute_30\" --use-local-env --cl-version 2013 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64" -rdc=true -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" --source-in-ptx  -lineinfo  --keep-dir x64\FastDebug -maxrregcount=0  --machine 64 --compile -cudart static -Xcompiler "/openmp"     -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MTd /GR" -o x64\FastDebug\sat.cu.obj "C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final\sat.cu" 
+  sat.cu
+  Compiling CUDA source file serial_features.cu...
+  
+  C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -gencode=arch=compute_50,code=\"sm_50,compute_50\" -gencode=arch=compute_30,code=\"sm_30,compute_30\" --use-local-env --cl-version 2013 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64" -rdc=true -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include" --source-in-ptx  -lineinfo  --keep-dir x64\FastDebug -maxrregcount=0  --machine 64 --compile -cudart static -Xcompiler "/openmp"     -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MTd /GR" -o x64\FastDebug\serial_features.cu.obj "C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final\serial_features.cu" 
+  serial_features.cu
+C:/Users/Shawn/google drive/visual studio 2013/Projects/408Final/408Final/serial_features.cu(175): warning C4018: '<' : signed/unsigned mismatch
+C:/Users/Shawn/google drive/visual studio 2013/Projects/408Final/408Final/serial_features.cu(181): warning C4018: '<' : signed/unsigned mismatch
+  
+  C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\408Final>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\nvcc.exe" -dlink -o x64\FastDebug\408Final.device-link.obj -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MTd /GR" -L"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\lib\x64" cudart.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib  -gencode=arch=compute_50,code=sm_50 -gencode=arch=compute_30,code=sm_30  --machine 64 x64\FastDebug\cascade.cu.obj x64\FastDebug\dataloader.cu.obj x64\FastDebug\features.cu.obj x64\FastDebug\haarfinder.cu.obj x64\FastDebug\main.cu.obj x64\FastDebug\sat.cu.obj x64\FastDebug\serial_features.cu.obj 
+  cudart.lib
+  kernel32.lib
+  user32.lib
+  gdi32.lib
+  winspool.lib
+  comdlg32.lib
+  advapi32.lib
+  shell32.lib
+  ole32.lib
+  oleaut32.lib
+  uuid.lib
+  odbc32.lib
+  odbccp32.lib
+  cascade.cu.obj
+  dataloader.cu.obj
+  features.cu.obj
+  haarfinder.cu.obj
+  main.cu.obj
+  sat.cu.obj
+  serial_features.cu.obj
+  408Final.vcxproj -> C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\x64\FastDebug\408Final.exe
+  copy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\cudart*.dll" "C:\Users\Shawn\google drive\visual studio 2013\Projects\408Final\x64\FastDebug\"
+  C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\cudart32_75.dll
+  C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin\cudart64_75.dll
+          2 file(s) copied.

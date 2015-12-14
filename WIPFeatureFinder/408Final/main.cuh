@@ -4,5 +4,6 @@
 #include "features.cuh"
 #include "serial_features.cuh"
 #include "dataloader.cuh"
+#include "cascade.cuh"
 
 int main();

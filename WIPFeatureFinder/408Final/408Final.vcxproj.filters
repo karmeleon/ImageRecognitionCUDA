@@ -7,6 +7,7 @@
     <CudaCompile Include="sat.cu" />
     <CudaCompile Include="dataloader.cu" />
     <CudaCompile Include="serial_features.cu" />
+    <CudaCompile Include="cascade.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.cuh" />
@@ -16,6 +17,7 @@
     <ClInclude Include="sat.cuh" />
     <ClInclude Include="dataloader.cuh" />
     <ClInclude Include="serial_features.cuh" />
+    <ClInclude Include="cascade.cuh" />
   </ItemGroup>
   <ItemGroup>
     <None Include="test_set_images" />
