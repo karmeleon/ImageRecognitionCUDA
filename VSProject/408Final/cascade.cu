@@ -6,6 +6,7 @@ using namespace std;
 
 #define BLOCK_SIZE 	 1024
 #define NUM_EXAMPLES 60000
+#define THETA		 50
 
 __constant__ unsigned char l[NUM_EXAMPLES];
 
@@ -130,33 +131,50 @@ __global__ void weak_classifier(_strong_classifier* strong_classifier, int* glob
 
 //////////////////////////////////////////////////
 
-void serial_weak_classifier(_strong_classifier* strong_classifier, feature* f, unsigned char* l, float* w, uint32_t num_features, uint32_t num_examples, uint16_t range)
+void serial_weak_classifier(_strong_classifier* strong_classifier, feature* f, unsigned char* l, float* w, int32_t num_features, uint32_t num_examples, uint16_t range)
 {
-	//Theta variables
-	uint16_t theta = range;
-	uint16_t min_theta = 0;
-
-	//Haar properties
-	int32_t perfect_haar;
-	uint32_t dist;
-
-	//Error values
-	uint32_t min_misclassified = INT_MAX;
-	uint32_t misclassified = 0;
-
-	//Weighted error values
-	float weighted_error = 0.0;
-	float min_weighted_error = FLT_MAX;
-
 	//Global min errors and values
 	float global_min_weighted_error = FLT_MAX;
 	uint32_t global_min_misclassified = 0;
 	uint32_t global_min_theta = 0;
 	uint32_t global_min_idx = 0;
 
+	float* private_min_weighted_error = (float*)malloc(sizeof(float) * std::thread::hardware_concurrency());
+	uint32_t* private_min_misclassified = (uint32_t*)malloc(sizeof(uint32_t) * std::thread::hardware_concurrency());
+	uint32_t* private_min_theta = (uint32_t*)malloc(sizeof(uint32_t) * std::thread::hardware_concurrency());
+	uint32_t* private_min_idx = (uint32_t*)malloc(sizeof(uint32_t) * std::thread::hardware_concurrency());
+
+	for (int i = 0; i < std::thread::hardware_concurrency(); i++) {
+		private_min_weighted_error[i] = FLT_MAX;
+		private_min_misclassified[i] = 0;
+		private_min_theta[i] = 0;
+		private_min_idx[i] = 0;
+	}
+
+	printf("num_features = %d\n", num_features);
+
 	//Loop through each feature
-	for (int i = 0; i < num_features; i++)
+	#pragma omp parallel for
+	for (int32_t i = 0; i < num_features; i++)
 	{
+		int id = omp_get_thread_num();
+
+		//Theta variables
+		uint16_t theta = range;
+		uint16_t min_theta = 0;
+
+		//Haar properties
+		int32_t perfect_haar;
+		uint32_t dist;
+
+		//Error values
+		uint32_t min_misclassified = INT_MAX;
+		uint32_t misclassified = 0;
+
+		//Weighted error values
+		float weighted_error = 0.0;
+		float min_weighted_error = FLT_MAX;
+
 		//Compute perfect haar and current feature's distance from that
 		perfect_haar = 127 * (f[i].x2 - f[i].x1)*(f[i].y2 - f[i].y1);
 		dist = abs(f[i].mag - perfect_haar);
@@ -204,103 +222,36 @@ void serial_weak_classifier(_strong_classifier* strong_classifier, feature* f, u
 			theta--;
 		}
 
-		printf("minMisclassifiedWeightedError=%f\n", min_misclassified*min_weighted_error);
-
 		//Find the minimum weighted error over all the features for the best feature
-		if (min_misclassified*min_weighted_error < global_min_weighted_error)
+		if (min_misclassified*min_weighted_error < private_min_weighted_error[id])
 		{
-			global_min_misclassified = min_misclassified;
-			global_min_weighted_error = min_misclassified*min_weighted_error;
-			global_min_theta = min_theta;
-			global_min_idx = i;
+			private_min_misclassified[id] = min_misclassified;
+			private_min_weighted_error[id] = min_misclassified*min_weighted_error;
+			private_min_theta[id] = min_theta;
+			private_min_idx[id] = i;
+		}
+
+		//printf("thread %d finished image %d\n", id, i);
+	}
+
+	for (int i = 0; i < std::thread::hardware_concurrency(); i++) {
+		if (private_min_misclassified[i] * private_min_weighted_error[i] < global_min_weighted_error) {
+			global_min_misclassified = private_min_misclassified[i];
+			global_min_weighted_error = private_min_misclassified[i] * private_min_weighted_error[i];
+			global_min_theta = private_min_theta[i];
+			global_min_idx = private_min_idx[i];
 		}
 	}
 
 	strong_classifier->weak_classifier[global_min_idx]._threshold = global_min_theta;
 	strong_classifier->weak_classifier[global_min_idx]._feature = f[global_min_idx];
 	strong_classifier->weak_classifier[global_min_idx]._error = global_min_weighted_error;
+
+	free(private_min_idx);
+	free(private_min_misclassified);
+	free(private_min_theta);
+	free(private_min_weighted_error);
 }
-
-/*void serial_weak_classifier(_strong_classifier* strong_classifier, feature* f, unsigned char* l, float* w, uint32_t num_features, uint32_t num_examples, uint16_t range)
-{
-uint16_t theta = range;
-uint16_t min_theta = 0;
-uint32_t minimum = INT_MAX;
-uint32_t error = 0;
-float weighted = 0;
-float min_weighted = 0;
-float global_min = INT_MAX;
-uint32_t global_min_error = 0;
-float global_min_weighted = 0;
-uint16_t global_min_theta = 0;
-uint32_t global_min_idx = 0;
-int32_t perfect_haar;
-
-//Loop through all features
-for (int i = 0; i < num_features; i++)
-{
-perfect_haar = 127 * (f[i].x2 - f[i].x1)*(f[i].y2 - f[i].y1);
-uint32_t diff = abs(f[i].mag - perfect_haar);
-min_weighted = 0;
-theta = range;
-
-minimum = INT_MAX;
-
-//Loop through theta values
-while (theta > 0)
-{
-error = 0;
-weighted = 0;
-
-//Loop through each image
-for (int j = 0; j < num_examples; j++)
-{
-if (diff < theta && l[j] != 0)
-{
-weighted += w[j];
-//printf("weighted is now %f (i=%d, j=%d)\n", weighted, i, j);
-error++;
-}
-else
-{
-if (l[j] == 0)
-{
-weighted += w[j];
-//printf("weighted is now %f (i=%d, j=%d)\n", weighted, i, j);
-error++;
-}
-}
-}
-
-//printf("error is %u at i=%d, theta=%u\n", error, i, theta);
-
-//Track the minimum error
-if (error < minimum)
-{
-minimum = error;
-min_weighted = weighted;
-min_theta = theta;
-}
-
-theta--;
-}
-
-printf("min_weighted for i=%d is %f\n", i, min_weighted);
-
-if (min_weighted < global_min)
-{
-global_min = min_weighted;
-global_min_error = minimum;
-global_min_weighted = min_weighted;
-global_min_theta = min_theta;
-global_min_idx = i;
-}
-}
-
-strong_classifier->weak_classifier[global_min_idx]._threshold = global_min_theta;
-strong_classifier->weak_classifier[global_min_idx]._feature = f[global_min_idx];
-strong_classifier->weak_classifier[global_min_idx]._error = global_min_weighted;
-}*/
 
 //////////////////////////////////////////////////
 
@@ -314,7 +265,7 @@ _strong_classifier* adaboost(feature* features, unsigned char* labels, uint32_t 
 	float tot_w = 0;
 
 	//Classifier threshold range
-	uint16_t theta = 500;
+	uint16_t theta = THETA;
 	//uint16_t theta = 1;
 
 	//Strong classifier
@@ -512,7 +463,7 @@ _strong_classifier* serial_adaboost(feature* features, unsigned char* labels, ui
 	float tot_w = 0;
 
 	//Classifier threshold range
-	uint16_t theta = 5000;
+	uint16_t theta = THETA;
 
 	//Strong classifier
 	_strong_classifier* strong_classifier = (_strong_classifier*)malloc(sizeof(_strong_classifier));
@@ -528,6 +479,9 @@ _strong_classifier* serial_adaboost(feature* features, unsigned char* labels, ui
 	//Training stage. Loop T stages or until error rate less than target error rate
 	for (int t = 0; t < stages; t++)
 	{
+		struct timeb start, end;
+		int diff;
+		ftime(&start);
 		//Append a new weak classifier to the strong classifier
 		//strong_classifier->append_classifier(t);
 
@@ -542,7 +496,7 @@ _strong_classifier* serial_adaboost(feature* features, unsigned char* labels, ui
 		}
 
 		//Train weak classifier h_j for each feature j
-		serial_weak_classifier(strong_classifier, features, labels, w, num_features, num_examples, theta);
+		serial_weak_classifier(strong_classifier, features, labels, w, num_features / 1000, num_examples, theta);
 
 		//Update the error and weights
 		error = strong_classifier->weak_classifier[t]._error;
@@ -579,6 +533,9 @@ _strong_classifier* serial_adaboost(feature* features, unsigned char* labels, ui
 		cout << "*****************************************************" << endl;
 		cout << "* Stage " << t << " done with error rate: " << strong_classifier->weak_classifier[t]._error << endl;
 		cout << "*****************************************************" << endl;
+		ftime(&end);
+		diff = (int)(1000.0 * (end.time - start.time) + (end.millitm - start.millitm));
+		printf("Computation took %d ms\n", diff);
 	}
 
 	return strong_classifier;
